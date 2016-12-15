@@ -1808,7 +1808,11 @@ EXPORT_SYMBOL_GPL(__cpuhp_state_add_instance);
  * @multi_instance:	State is set up for multiple instances which get
  *			added afterwards.
  *
- * Returns 0 if successful, otherwise a proper error code
+ * Returns:
+ *   On success:
+ *      Positive state number if @state is CPUHP_AP_ONLINE_DYN
+ *      0 for all other states
+ *   On failure: proper (negative) error code
  */
 int __cpuhp_setup_state(enum cpuhp_state state,
 			const char *name, bool invoke,
