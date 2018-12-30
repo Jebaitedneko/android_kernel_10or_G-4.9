@@ -19,7 +19,7 @@ ghash-ce-y := ghash-ce-glue.o ghash-ce-core.o
 
 obj-$(CONFIG_CRYPTO_AES_ARM64_CE) += aes-ce-cipher.o
 aes-ce-cipher-y := aes-ce-cipher-glue.o aes-ce-cipher-core.o
-CFLAGS_aes-ce-cipher-core.o += -march=armv8-a+crypto -Wa,-march=armv8-a+crypto $(DISABLE_LTO)
+CFLAGS_aes-ce-cipher-core.o += -march=armv8-a+crypto -Wa,-march=armv8-a+crypto $(DISABLE_LTO) $(call cc-option,-no-integrated-as)
 
 obj-$(CONFIG_CRYPTO_AES_ARM64_CE_CCM) += aes-ce-ccm.o
 aes-ce-ccm-y := aes-ce-ccm-glue.o aes-ce-ccm-core.o
@@ -36,7 +36,7 @@ sha256-arm64-y := sha256-glue.o sha256-core.o
 obj-$(CONFIG_CRYPTO_SHA512_ARM64) += sha512-arm64.o
 sha512-arm64-y := sha512-glue.o sha512-core.o
 
-AFLAGS_aes-ce.o		:= -DINTERLEAVE=4 -DINTERLEAVE_INLINE
+AFLAGS_aes-ce.o		:= -DINTERLEAVE=4
 AFLAGS_aes-neon.o	:= -DINTERLEAVE=4
 
 CFLAGS_aes-glue-ce.o	:= -DUSE_V8_CRYPTO_EXTENSIONS
