@@ -615,8 +615,7 @@ static int msm_isp_composite_irq(struct vfe_device *vfe_dev,
  *
  * Returns void
  */
-static void msm_isp_update_framedrop_reg(struct msm_vfe_axi_stream *stream_info,
-		uint32_t drop_reconfig)
+static void msm_isp_update_framedrop_reg(struct msm_vfe_axi_stream *stream_info)
 {
 	if (stream_info->stream_type == BURST_STREAM) {
 		if (stream_info->runtime_num_burst_capture == 0 ||
@@ -696,8 +695,7 @@ void msm_isp_process_reg_upd_epoch_irq(struct vfe_device *vfe_dev,
 					drop_reconfig =
 						temp->isp_page->drop_reconfig;
 				}
-				msm_isp_update_framedrop_reg(stream_info,
-					drop_reconfig);
+				msm_isp_update_framedrop_reg(stream_info);
 			}
 			break;
 		default:
