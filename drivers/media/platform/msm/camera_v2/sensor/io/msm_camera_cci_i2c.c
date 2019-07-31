@@ -88,6 +88,7 @@ int32_t msm_camera_cci_i2c_read_seq(struct msm_camera_i2c_client *client,
 	CDBG("%s line %d rc = %d\n", __func__, __LINE__, rc);
 	rc = cci_ctrl.status;
 
+
 	S_I2C_DBG("%s addr = 0x%x", __func__, addr);
 	return rc;
 }
