@@ -1873,6 +1873,7 @@ static void drm_kick_frame_boost(int timeout_ms)
 
 	if (timeout_ms < 0 || should_kick_frame_boost(timeout_ms)) {
 		devfreq_boost_kick(DEVFREQ_MSM_CPUBW);
+		devfreq_boost_kick(DEVFREQ_MSM_LLCCBW);
 	}
 }
 
