@@ -167,10 +167,11 @@
 			size = <0 0x1400000>;
 			linux,cma-default;
 		};
-
-    board_gpios:board_gpios@0 {
+		
+		board_gpios: board_gpios@0 {
 		compatible = "pcb-gpio";
 		stage-gpio = <106 81 17 3>;
+		};
 	};
 
 	aliases {
