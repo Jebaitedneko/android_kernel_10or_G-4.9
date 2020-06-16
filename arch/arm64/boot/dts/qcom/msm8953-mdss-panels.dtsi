@@ -28,6 +28,8 @@
 #include "dsi-panel-boent51021-1200p-video.dtsi"
 #include "dsi-panel-hx8394d-wxga-video.dtsi"
 #include "dsi-panel-inxnt51021-1200p-video.dtsi"
+#include "dsi-panel-hx8399c-auo-53-1080p-video.dtsi"
+#include "dsi-panel-ili7807d-djn-53-1080p-video.dtsi"
 
 &soc {
 	dsi_panel_pwr_supply: dsi_panel_pwr_supply {
@@ -69,6 +71,22 @@
 			qcom,supply-post-on-sleep = <10>;
 		};
 	};
+};
+
+&dsi_hx8399c_auo_53_1080p_video {
+	qcom,mdss-dsi-panel-timings-phy-v2  = [25 1F 09 0a 06 03 04 a0
+		25 1F 09 0a 06 03 04 a0
+		25 1F 09 0a 06 03 04 a0
+		25 1F 09 0a 06 03 04 a0
+	        25 1E 08 0a 06 03 04 a0];
+};
+
+&dsi_ili7807d_djn_53_1080p_video {
+	qcom,mdss-dsi-panel-timings-phy-v2  = [25 20 09 0A 06 03 04 a0
+		25 20 09 0A 06 03 04 a0
+		25 20 09 0A 06 03 04 a0
+		25 20 09 0A 06 03 04 a0
+	        25 1E 09 0A 06 03 04 a0];
 };
 
 &dsi_truly_1080_vid {

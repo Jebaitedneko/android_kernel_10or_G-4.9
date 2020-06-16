@@ -9,6 +9,8 @@
 #
 # Normal rules
 #
+out
+build*.sh
 .*
 *.o
 *.o.*

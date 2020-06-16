@@ -14,6 +14,27 @@
 #include "msm8953-qrd.dtsi"
 #include "msm8953-camera-sensor-qrd.dtsi"
 
+/ {
+	firmware: firmware {
+		android {
+			fstab {
+				vendor {
+					dev = "/dev/block/platform/soc/7824900.sdhci/by-name/vendor";
+					fsmgr_flags = "wait";
+				};
+				system {
+					compatible = "android,system";
+					dev = "/dev/block/platform/soc/7824900.sdhci/by-name/system";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1,discard";
+					fsmgr_flags = "wait";
+					status = "ok";
+				};
+			};
+		};
+	};
+};
+
 &spmi_bus {
 	qcom,pmi8950@3 {
 		labibb: qpnp-labibb-regulator {
@@ -89,7 +110,7 @@
 	ibb-supply = <&ibb_regulator>;
 	/delete-property/ vdd-supply;
 
-	qcom,dsi-pref-prim-pan = <&dsi_r69006_1080p_cmd>;
+	qcom,dsi-pref-prim-pan = <&dsi_hx8399c_auo_53_1080p_video>;
 	pinctrl-names = "mdss_default", "mdss_sleep";
 	pinctrl-0 = <&mdss_dsi_active &mdss_te_active>;
 	pinctrl-1 = <&mdss_dsi_suspend &mdss_te_suspend>;
@@ -106,11 +127,70 @@
 	qpnp,qpnp-labibb-mode = "lcd";
 };
 
-&dsi_r69006_1080p_cmd {
-	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+&dsi_hx8399c_auo_53_1080p_video {
 	qcom,esd-check-enabled;
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
 };
 
-&dsi_r69006_1080p_video {
+&dsi_ili7807d_djn_53_1080p_video {
+	qcom,esd-check-enabled;
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
 };
+
+&int_codec {
+	status = "ok";
+};
+
+&pm8953_diangu_dig {
+	status = "ok";
+};
+
+&pm8953_diangu_analog {
+	status = "ok";
+};
+
+&ext_codec {
+	status = "disabled";
+	qcom,model = "msm8953-sku3-tasha-snd-card";
+
+	qcom,audio-routing =
+		"AIF4 VI", "MCLK",
+		"RX_BIAS", "MCLK",
+		"DMIC0", "MIC BIAS1",
+		"MIC BIAS1", "Digital Mic0",
+		"AMIC2", "MIC BIAS2",
+		"MIC BIAS2", "Headset Mic",
+		"DMIC2", "MIC BIAS3",
+		"MIC BIAS3", "Digital Mic2",
+		"MIC BIAS1", "MICBIAS_REGULATOR",
+		"MIC BIAS2", "MICBIAS_REGULATOR",
+		"MIC BIAS3", "MICBIAS_REGULATOR",
+		"SpkrLeft IN", "SPK1 OUT";
+
+	qcom,cdc-us-euro-gpios;
+
+	qcom,msm-mbhc-hphl-swh = <1>;
+
+	qcom,wsa-max-devs = <1>;
+	qcom,wsa-devs = <&wsa881x_211>, <&wsa881x_213>;
+	qcom,wsa-aux-dev-prefix = "SpkrLeft", "SpkrLeft";
+};
+
+&slim_msm {
+	status = "disabled";
+};
+
+&dai_slim {
+	status = "disabled";
+};
+
+&clock_audio {
+	status = "disabled";
+};
+
+&wcd9335 {
+	status = "disabled";
+};
+
+&wcd_rst_gpio {
+	status = "disabled";
