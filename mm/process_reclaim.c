@@ -39,7 +39,7 @@ module_param_named(reclaim_avg_efficiency, reclaim_avg_efficiency, int, 0444);
 
 /* The vmpressure region where process reclaim operates */
 static unsigned long pr_pressure_min = 20;
-static unsigned long pr_pressure_max = 70;
+static unsigned long pr_pressure_max = 90;
 module_param_named(pr_pressure_min, pr_pressure_min, ulong, 0644);
 module_param_named(pr_pressure_max, pr_pressure_max, ulong, 0644);
 
@@ -58,13 +58,16 @@ module_param_named(pr_swap_eff_win, pr_swap_eff_win, int, 0644);
 static int pr_swap_opt_eff = 50;
 module_param_named(pr_swap_opt_eff, pr_swap_opt_eff, int, 0644);
 
-/* Minimum amount of swap pages to be retained */
-static int free_swap_limit = 50;
-module_param_named(free_swap_limit, free_swap_limit, int, 0644);
+/*
+ * OOM Killer will be called if the total number of
+ * file pages (active+inactive) reaches this limit
+ */
+static int free_file_limit = 340000;
+module_param_named(free_file_limit, free_file_limit, int, 0644);
 
-/* Percentage of swap pages above/below which tasks should be killed */
-static int free_percent = 15;
-module_param_named(free_percent, free_percent, int, 0644);
+/* Number of SWAP pages in MiB below which tasks should be killed */
+static int free_swap_limit = 40;
+module_param_named(free_swap_limit, free_swap_limit, int, 0644);
 
 /* Minimum OOM score above which tasks should be killed */
 static short score_kill_limit = 300;
@@ -81,8 +84,8 @@ struct selected_task {
 };
 
 static const short never_reclaim[] = {
-	0, /* Foreground task */ 
-	50, 
+	0, /* Foreground task */
+	50,
 	200 /* Running service */
 };
 
@@ -119,8 +122,8 @@ static int test_task_flag(struct task_struct *p, int flag)
 static int score_adj_check(short oom_score_adj)
 {
 	int i;
-	short never_reclaim_size = (sizeof never_reclaim/sizeof never_reclaim[0]);
-	
+	short never_reclaim_size = ARRAY_SIZE(never_reclaim);
+
 	for (i = 0; i < never_reclaim_size; i++)
 		if (oom_score_adj == never_reclaim[i])
 			return 1;
@@ -137,21 +140,56 @@ static void mark_lmk_victim(struct task_struct *tsk)
 		set_bit(MMF_OOM_VICTIM, &mm->flags);
 	}
 }
-/* 
- * TODO: Handle a situation where a system freeze occurs, under 
- * very heavy memory pressure and no free/available pages as fast as possible,
- * given that we are shielding some processes from being scanned or killed(score_kill_limit).
- * We do NOT want the system to freeze for extended periods of time. 
+
+/*
+ * Low-memory notification levels
+ *
+ * LOWMEM_NONE: No low-memory scenario detected.
+ *
+ * LOWMEM_NORMAL: A scenario in which the RAM and SWAP
+ * memory levels are below defined thresholds.
+ * (free_mem and swap_mem respectively, defined below)
+ *
+ * LOWMEM_CRITICAL: A scenario in which the LOWMEM_NORMAL
+ * condition is satisfied, as well as when the reclaimable
+ * file pages (active+inactive) are below a certain threshold.
+ * (free_file_limit as defined above)
  */
+enum lowmem_levels {
+	LOWMEM_NONE,
+	LOWMEM_NORMAL,
+	LOWMEM_CRITICAL,
+};
+
+static int is_low_mem(void)
+{
+	const int lru_base = NR_LRU_BASE - LRU_BASE;
+
+	unsigned long cur_file_mem =
+			global_page_state(lru_base + LRU_ACTIVE_FILE) +
+			global_page_state(lru_base + LRU_INACTIVE_FILE);
+
+	unsigned long cur_swap_mem = (get_nr_swap_pages() << (PAGE_SHIFT - 10));
+	unsigned long swap_mem = free_swap_limit * 1024;
+
+	bool lowmem_normal = cur_swap_mem < swap_mem;
+	bool lowmem_critical = lowmem_normal &&
+				cur_file_mem > free_file_limit;
+
+	if (lowmem_critical)
+		return LOWMEM_CRITICAL;
+	else if (lowmem_normal)
+		return LOWMEM_NORMAL;
+	else
+		return LOWMEM_NONE;
+}
+
 static void sort_and_kill_tasks(struct task_struct *tasks_to_kill[], int tsi)
 {
 	int i, j, max = tsi;
 	struct task_struct *temp;
 
-	int cur_swap = 0;
-	int swap_max = (free_swap_limit + (free_swap_limit * free_percent/100)) * 1024;
-	
-	/* 
+	/*
 	 * We sort tasks based on (stime+utime) since last accessed,
 	 * in descending order.
 	 *
@@ -159,39 +197,36 @@ static void sort_and_kill_tasks(struct task_struct *tasks_to_kill[], int tsi)
 	 */
 	for (i = 0; i < tsi; i++) {
 		for (j = i + 1; j < tsi; j++) {
-		
-			if (tasks_to_kill[i]->acct_timexpd < tasks_to_kill[j]->acct_timexpd) {
-			
+
+			if (tasks_to_kill[i]->acct_timexpd <
+					tasks_to_kill[j]->acct_timexpd) {
+
 				temp = tasks_to_kill[i];
 				tasks_to_kill[i] = tasks_to_kill[j];
 				tasks_to_kill[j] = temp;
-			
+
 			}
 		}
 	}
-	
+
 	/* We kill tasks with the lowest (stime+utime) */
-	while(tsi--) {	
+	while (tsi--) {
 		struct task_struct *tsk = tasks_to_kill[tsi];
-		
-		/* Stop killing tasks once swap pages are above the swap_max limit */
-		cur_swap = (get_nr_swap_pages() << (PAGE_SHIFT - 10)); 
-		if (cur_swap > swap_max)
+
+		if (is_low_mem() == LOWMEM_NONE)
 			break;
-		
+
 		task_lock(tsk);
-		
 		send_sig(SIGKILL, tsk, 0);
 		if (tsk->mm) {
-			if (!test_bit(MMF_OOM_SKIP, &tsk->mm->flags)) { 
+			if (!test_bit(MMF_OOM_SKIP, &tsk->mm->flags)) {
 				mark_lmk_victim(tsk);
 				wake_oom_reaper(tsk);
 			}
 		}
-		
 		task_unlock(tsk);
-		
-		pr_debug(KERN_INFO "process_reclaim: total:%d[%d] comm:%s(%d) txpd:%llu KILLED!",
+
+		pr_debug("process_reclaim: total:%d[%d] comm:%s(%d) txpd:%llu KILLED!",
 				max,
 				(tsi + 1),
 				tsk->comm,
@@ -217,20 +252,25 @@ static void swap_fn(struct work_struct *work)
 	int i;
 	int si = 0;
 	int tsi = 0;
-	
+
 	int tasksize;
-	
+
 	int total_sz = 0;
 	int total_scan = 0;
 	int total_reclaimed = 0;
-	
+
 	int nr_to_reclaim;
 	int efficiency;
 	
-	int cur_swap = 0;
-	int swap_max = (free_swap_limit + (free_swap_limit * free_percent/100)) * 1024;
-	int swap_min = (free_swap_limit - (free_swap_limit * free_percent/100)) * 1024;
-
+	/*
+	 * In case memory is critically low, i.e at a
+	 * LOWMEM_CRITICAL level as defined above lowmem_levels,
+	 * we kill a memory-hogging task as fast as possible,
+	 * so as to prevent a system-freeze.
+	 */
+	if (is_low_mem() == LOWMEM_CRITICAL)
+		pagefault_out_of_memory();
+	
 	rcu_read_lock();
 	for_each_process(tsk) {
 		struct task_struct *p;
@@ -251,13 +291,13 @@ static void swap_fn(struct work_struct *work)
 			task_unlock(p);
 			continue;
 		}
-		
+
 		tasksize = get_mm_counter(p->mm, MM_ANONPAGES);
 		task_unlock(p);
 
 		if (tasksize <= 0)
 			continue;
-		
+
 		if (si == MAX_SWAP_TASKS) {
 			sort(&selected[0], MAX_SWAP_TASKS,
 					sizeof(struct selected_task),
@@ -275,7 +315,7 @@ static void swap_fn(struct work_struct *work)
 		}
 	}
 
-	for (i = 0; i < si; i++) 
+	for (i = 0; i < si; i++)
 		total_sz += selected[i].tasksize;
 
 	/* Skip reclaim if total size is too less */
@@ -290,44 +330,29 @@ static void swap_fn(struct work_struct *work)
 	rcu_read_unlock();
 
 	while (si--) {
-		nr_to_reclaim = (selected[si].tasksize * pr_per_swap_size) / total_sz;
-			
+		nr_to_reclaim =
+			(selected[si].tasksize * pr_per_swap_size) / total_sz;
+
 		/* scan atleast a page */
 		if (!nr_to_reclaim)
 			nr_to_reclaim = 1;
-			
+
 		rp = reclaim_task_anon(selected[si].p, nr_to_reclaim);
 
 		total_scan += rp.nr_scanned;
 		total_reclaimed += rp.nr_reclaimed;
-		
-		cur_swap = (get_nr_swap_pages() << (PAGE_SHIFT - 10));
-		
-		if (cur_swap < swap_max && 
-				selected[si].oom_score_adj > score_kill_limit) {
 
-			/*
-			 * There's always a possibility that swap pages may be depleted
-			 * very quickly below the free_swap_limit during high memory pressure.
-			 * We need to free pages before the number of swap pages reaches zero,
-			 * and system freezes start occuring.
-			 *
-			 * To react quickly, we need to started killing processes and freeing
-			 * memory when the number of swap pages is in between swap_min and swap_max.
-			 * Also, take care of a situation where the number of swap pages are suddenly
-			 * below swap_min.
-			 */
-			if ((cur_swap >= swap_min && cur_swap < swap_max) || cur_swap < swap_min) {
-				tasks_to_kill[tsi] = selected[si].p;
-				tsi += 1;
-			}
+		if (is_low_mem() > LOWMEM_NONE &&
+				selected[si].oom_score_adj > score_kill_limit) {
+			tasks_to_kill[tsi] = selected[si].p;
+			tsi += 1;
 
 		} else {
 			put_task_struct(selected[si].p);
 		}
 	}
 
-	if (tsi > 1) 
+	if (tsi > 1)
 		sort_and_kill_tasks(tasks_to_kill, tsi);
 
 	if (total_scan) {
@@ -351,13 +376,13 @@ static int vmpressure_notifier(struct notifier_block *nb,
 			unsigned long action, void *data)
 {
 	unsigned long pressure = action;
-	
+
 	if (!current_is_kswapd())
 		return 0;
 
 	if (atomic_dec_if_positive(&skip_reclaim) >= 0)
 		return 0;
-	
+
 	if ((pressure >= pr_pressure_min) && (pressure < pr_pressure_max))
 		if (!work_pending(&swap_work))
 			queue_work(system_unbound_wq, &swap_work);
@@ -368,7 +393,7 @@ static struct notifier_block vmpr_nb = {
 	.notifier_call = vmpressure_notifier,
 };
 
-/* 
+/*
  * Needed to prevent Android from thinking there's no LMK and thus rebooting.
  * Taken from Simple LMK (@kerneltoast).
  */
@@ -377,11 +402,10 @@ static int process_reclaim_init(const char *val, const struct kernel_param *kp)
 #ifdef CONFIG_TASK_XACCT
 	static atomic_t init_done = ATOMIC_INIT(0);
 
-	if (!atomic_cmpxchg(&init_done, 0, 1)) {
+	if (!atomic_cmpxchg(&init_done, 0, 1))
 		BUG_ON(vmpressure_notifier_register(&vmpr_nb));
-	}
 #else
-	printk_deferred("process_reclaim: CONFIG_TASK_XACCT not enabled! Process Reclaim will not work!");
+	printk_deferred("process_reclaim: CONFIG_TASK_XACCT not enabled!");
 #endif
 	return 0;
 }
