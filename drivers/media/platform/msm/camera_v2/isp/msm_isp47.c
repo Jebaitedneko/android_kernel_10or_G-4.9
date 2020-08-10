@@ -26,7 +26,7 @@
 #include "linux/iopoll.h"
 
 #undef CDBG
-#define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#define CDBG(fmt, args...)
 
 #define VFE47_8996V1_VERSION   0x70000000
 
