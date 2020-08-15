@@ -1,0 +1,72 @@
+/* Copyright (c) 2020, The Linux Foundation. All rights reserved.
+*  Copyright (c) 2020, Jebaitedneko.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License version 2 and
+* only version 2 as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*/
+
+/ {
+	firmware: firmware {
+
+		android {
+
+			fstab {
+
+				vendor {
+
+					dev = "/dev/block/platform/soc/7824900.sdhci/by-name/vendor";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1,discard";
+					fsmgr_flags = "wait";
+					status = "ok";
+				};
+
+				system {
+
+					compatible = "android,system";
+					dev = "/dev/block/platform/soc/7824900.sdhci/by-name/system";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1,discard";
+					fsmgr_flags = "wait";
+					status = "ok";
+				};
+			};
+		};
+	};
+
+	reserved-memory {
+
+		pstore_reserve_mem: pstore_reserve_mem_region@0 {
+
+			linux,reserve-contiguous-region;
+			linux,reserve-region;
+			linux,remove-completely;
+			compatible = "removed-dma-pool";
+			no-map;
+			reg = <0x0 0x9ff00000 0x0 0x00300000>;
+			label = "pstore_reserve_mem";
+		};
+	};
+};
+
+&other_ext_mem {
+	reg = <0x0 0x84A00000 0x0 0x1E00000>;
+};
+
+&modem_mem {
+
+	no-map;
+
+	/delete-property/ no-map-fixup;
+
+};
+
+&qrd_batterydata {
+	#include "batterydata_Amazon_4V4_4000mAh.dtsi"
+};

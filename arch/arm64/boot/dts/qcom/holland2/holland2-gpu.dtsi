@@ -1,0 +1,43 @@
+/* Copyright (c) 2020, The Linux Foundation. All rights reserved.
+*  Copyright (c) 2020, Jebaitedneko.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License version 2 and
+* only version 2 as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*/
+
+&kgsl_smmu {
+	qcom,deferred-regulator-disable-delay = <0x50>;
+};
+
+&apps_iommu {
+	#iommu-cells = <0x1>;
+};
+
+&msm_gpu {
+
+	qcom,gpu-quirk-lmloadkill-disable;
+
+	qcom,gpu-mempools {
+
+		#address-cells = <0x1>;
+		#size-cells = <0x0>;
+		compatible = "qcom,gpu-mempools";
+		qcom,mempool-max-pages = <0x8000>;
+
+		qcom,gpu-mempool@0 {
+			reg = <0x0>;
+			qcom,mempool-page-size = <0x1000>;
+		};
+
+		qcom,gpu-mempool@1 {
+			reg = <0x1>;
+			qcom,mempool-page-size = <0x10000>;
+		};
+	};
+};
