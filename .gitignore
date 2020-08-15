@@ -9,6 +9,7 @@
 #
 # Normal rules
 #
+anykernel
 out
 build*.sh
 .*
