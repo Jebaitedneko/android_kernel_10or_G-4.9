@@ -42,10 +42,59 @@
 				qcom,s2-timer = <1000>;
 				qcom,s2-type = <7>;
 			};
+
+			qcom,pon_3 {
+
+				qcom,pon-type = <3>;
+				qcom,pull-up = <1>;
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <6720>;
+				qcom,s2-timer = <2000>;
+				qcom,s2-type = <7>;
+			};
 		};
+
+		pm8953_gpios: gpios {
+
+			gpio@c700 {
+				status = "okay";
+				qcom,master-en = <0>;
+			};
+		};
+
+		pm8953_vadc: vadc@3100 {
+
+			chan@36 {
+				qcom,decimation = <1>;
+				qcom,fast-avg-setup = <5>;
+			};
+		};
+
+		pm8953_adc_tm: vadc@3400 {
+
+			chan@36 {
+				qcom,decimation = <1>;
+				qcom,fast-avg-setup = <5>;
+			};
+		};
+
+		/delete-node/ qcom,pm8953_typec@bf00;
 	};
 
 	qcom,pmi8950@2 {
+
+		pmi8950_gpios: gpios {
+
+			gpio@c000 {
+
+				status = "okay";
+				qcom,mode = <1>;
+				qcom,pull = <4>;
+				qcom,src-sel = <2>;
+				qcom,master-en = <1>;
+				qcom,out-strength = <2>;
+			};
+		};
 
 		pmi8950_charger: qcom,qpnp-smbcharger {
 
@@ -85,6 +134,29 @@
 			/delete-property/ qcom,hot-bat-decidegc;
 			/delete-property/ qcom,warm-bat-decidegc;
 
+		};
+	};
+
+	qcom,pmi8950@3 {
+
+		pmi8950_pwm: pwm@b000 {
+			status = "okay";
+		};
+
+		labibb: qpnp-labibb-regulator {
+			status = "okay";
+		};
+
+		wled: qcom,leds@d800 {
+			/delete-property/ qcom,en-ext-pfet-sc-pro;
+		};
+
+		pmi_haptic: qcom,haptics@c000 {
+
+			qcom,actuator-type = <1>;
+			qcom,vmax-mv = <3000>;
+			qcom,use-play-irq;
+			qcom,use-sc-irq;
 		};
 	};
 };

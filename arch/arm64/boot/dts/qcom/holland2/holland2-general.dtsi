@@ -143,6 +143,11 @@
 		qcom,y-offset = <0>;
 	};
 
+	usb3: ssusb@7000000 {
+		vbus_dwc3-supply = <&smbcharger_charger_otg>;
+		qcom,detect-dpdm-floating;
+	};
+
 	goodix_fp {
 
 		status = "ok";
