@@ -96,9 +96,6 @@ static int voice_send_cvp_topology_commit_cmd(struct voice_data *v);
 static int voice_send_cvp_channel_info_cmd(struct voice_data *v);
 static int voice_send_cvp_channel_info_v2(struct voice_data *v,
 					  uint32_t param_type);
-#ifndef CONFIG_MACH_XIAOMI_C6
-static int voice_get_avcs_version_per_service(uint32_t service_id);
-#endif
 
 static int voice_cvs_stop_playback(struct voice_data *v);
 static int voice_cvs_start_playback(struct voice_data *v);
@@ -4345,37 +4342,6 @@ static int voice_send_cvp_mfc_config_cmd(struct voice_data *v)
 	return ret;
 }
 
-#ifndef CONFIG_MACH_XIAOMI_C6
-static int voice_get_avcs_version_per_service(uint32_t service_id)
-{
-	int ret = 0;
-	size_t ver_size;
-	struct avcs_fwk_ver_info *ver_info = NULL;
-
-	if (service_id == AVCS_SERVICE_ID_ALL) {
-		pr_err("%s: Invalid service id: %d", __func__,
-		       AVCS_SERVICE_ID_ALL);
-		return -EINVAL;
-	}
-
-	ver_size = sizeof(struct avcs_get_fwk_version) +
-		   sizeof(struct avs_svc_api_info);
-	ver_info = kzalloc(ver_size, GFP_KERNEL);
-	if (ver_info == NULL)
-		return -ENOMEM;
-
-	ret = q6core_get_service_version(service_id, ver_info, ver_size);
-	if (ret < 0)
-		goto done;
-
-	ret = ver_info->services[0].api_version;
-	common.is_avcs_version_queried = true;
-done:
-	kfree(ver_info);
-	return ret;
-}
-#endif
-
 static void voice_mic_break_work_fn(struct work_struct *work)
 {
 	int ret = 0;
@@ -4403,23 +4369,7 @@ static int voice_setup_vocproc(struct voice_data *v)
 		goto fail;
 	}
 
-#ifndef CONFIG_MACH_XIAOMI_C6
-	if (common.is_avcs_version_queried == false)
-		common.cvp_version = voice_get_avcs_version_per_service(
-				     APRV2_IDS_SERVICE_ID_ADSP_CVP_V);
-
-	if (common.cvp_version < 0) {
-		pr_err("%s: Invalid CVP version %d\n",
-		       __func__, common.cvp_version);
-		ret = -EINVAL;
-		goto fail;
-	}
-	pr_debug("%s: CVP Version %d\n", __func__, common.cvp_version);
-
-	ret = voice_send_cvp_media_fmt_info_cmd(v);
-#else
 	ret = voice_send_cvp_device_channels_cmd(v);
-#endif
 	if (ret < 0) {
 		pr_err("%s: Set media format info failed err:%d\n", __func__,
 		       ret);
