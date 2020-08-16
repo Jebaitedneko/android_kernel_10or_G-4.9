@@ -64,6 +64,7 @@ struct msm_asoc_mach_data {
 	int ext_pa;
 	int us_euro_gpio;
 	int spk_ext_pa_gpio;
+    int spk_ext_pa1_gpio;
 	int mclk_freq;
 	bool native_clk_set;
 	int lb_mode;
