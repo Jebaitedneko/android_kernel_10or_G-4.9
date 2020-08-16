@@ -317,6 +317,9 @@ int is_ext_spk_gpio_support(struct platform_device *pdev,
 			struct msm_asoc_mach_data *pdata)
 {
 	const char *spk_ext_pa = "qcom,msm-spk-ext-pa";
+#ifdef CONFIG_MACH_TENOR_G
+	const char *spk_ext_pa1 = "qcom,msm-spk-ext-pa1";
+#endif
 
 	pr_debug("%s:Enter\n", __func__);
 
@@ -332,9 +335,33 @@ int is_ext_spk_gpio_support(struct platform_device *pdev,
 				__func__, pdata->spk_ext_pa_gpio);
 			return -EINVAL;
 		}
+#ifdef CONFIG_MACH_TENOR_G
+		else
+		{
+			pr_err("%s: enable speaker 1 gpio: %d",
+				__func__, pdata->spk_ext_pa_gpio);
+		}
+#endif
 	}
 #ifdef CONFIG_MACH_TENOR_G
+	pdata->spk_ext_pa1_gpio = of_get_named_gpio(pdev->dev.of_node,
+				spk_ext_pa1, 0);
+	if (pdata->spk_ext_pa1_gpio < 0) {
+		dev_dbg(&pdev->dev,"%s: missing %s in dt node\n", __func__, spk_ext_pa1);
+	} else {
+		if (!gpio_is_valid(pdata->spk_ext_pa1_gpio)) {
+			pr_err("%s: Invalid external speaker 1 gpio: %d",
+				__func__, pdata->spk_ext_pa1_gpio);
+			return -EINVAL;
+		}
+		else
+		{
+			pr_err("%s: enable speaker pa2 gpio: %d",
+				__func__, pdata->spk_ext_pa1_gpio);
+		}
+	}
 	gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
+	gpio_direction_output(pdata->spk_ext_pa1_gpio, 0);
 #endif
 	return 0;
 }
@@ -355,6 +382,13 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 		return false;
 	}
 
+#ifdef CONFIG_MACH_TENOR_G
+	if (!gpio_is_valid(pdata->spk_ext_pa1_gpio)) {
+		pr_err("%s: Invalid gpio1: %d\n", __func__,
+			pdata->spk_ext_pa1_gpio);
+		return false;
+	}
+#endif
 	pr_debug("%s: %s external speaker PA\n", __func__,
 		enable ? "Enable" : "Disable");
 
@@ -364,6 +398,10 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 			gpio_set_value_cansleep(pdata->spk_ext_pa_gpio, 0);
 			udelay(2);
 			gpio_set_value_cansleep(pdata->spk_ext_pa_gpio, enable);
+			udelay(2);
+			gpio_set_value_cansleep(pdata->spk_ext_pa1_gpio, 0);
+			udelay(2);
+			gpio_set_value_cansleep(pdata->spk_ext_pa1_gpio, enable);
 			udelay(2);
 			pa_mode--;
 		}
@@ -379,6 +417,9 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 #endif
 	} else {
 		gpio_set_value_cansleep(pdata->spk_ext_pa_gpio, enable);
+#ifdef CONFIG_MACH_TENOR_G
+		gpio_set_value_cansleep(pdata->spk_ext_pa1_gpio, enable);
+#endif
 #ifndef CONFIG_MACH_TENOR_G
 		ret = msm_cdc_pinctrl_select_sleep_state(
 				pdata->spk_ext_pa_gpio_p);
@@ -1543,7 +1584,7 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 
 #define S(X, Y) ((WCD_MBHC_CAL_PLUG_TYPE_PTR(msm8952_wcd_cal)->X) = (Y))
 #ifdef CONFIG_MACH_TENOR_G
-	S(v_hs_max, 1600);
+	S(v_hs_max, 1700);
 #else
 	S(v_hs_max, 1500);
 #endif
