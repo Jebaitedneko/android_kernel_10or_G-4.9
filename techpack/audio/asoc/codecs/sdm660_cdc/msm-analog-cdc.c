@@ -18,6 +18,9 @@
 #include <linux/regulator/consumer.h>
 #include <linux/workqueue.h>
 #include <linux/regmap.h>
+#ifdef CONFIG_MACH_TENOR_G
+#include <linux/gpio.h>
+#endif
 #include <sound/pcm.h>
 #include <sound/pcm_params.h>
 #include <sound/soc.h>
@@ -32,6 +35,9 @@
 #include "sdm660-cdc-irq.h"
 #include "msm-analog-cdc-regmap.h"
 #include "../wcd-mbhc-v2-api.h"
+#ifdef CONFIG_MACH_TENOR_G
+#include "../../msm8952.h"
+#endif
 
 #define DRV_NAME "pmic_analog_codec"
 #define SDM660_CDC_RATES (SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_16000 |\
@@ -1625,6 +1631,139 @@ static int msm_anlg_cdc_pa_gain_get(struct snd_kcontrol *kcontrol,
 	return 0;
 }
 
+#ifdef CONFIG_MACH_TENOR_G
+static int msm_anlg_cdc_ear_2in1_get(struct snd_kcontrol *kcontrol,
+				struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
+	struct sdm660_cdc_priv *msm8x16_wcd = snd_soc_codec_get_drvdata(codec);
+
+	ucontrol->value.integer.value[0] =
+		(msm8x16_wcd->ear_2in1_ctrl_set ? 1 : 0);
+	dev_dbg(codec->dev, "%s: msm8x16_wcd->ear_2in1_ctrl_set = %d\n",
+			__func__, msm8x16_wcd->ear_2in1_ctrl_set);
+	return 0;
+}
+
+static int msm_anlg_cdc_ear_2in1_set(struct snd_kcontrol *kcontrol,
+				struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
+	struct sdm660_cdc_priv *msm8x16_wcd = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_card *card = codec->component.card;
+	struct msm_asoc_mach_data *pdata = snd_soc_card_get_drvdata(card);
+
+	dev_dbg(codec->dev, "%s: ucontrol->value.integer.value[0] = %ld\n",
+		__func__, ucontrol->value.integer.value[0]);
+
+	msm8x16_wcd->ear_2in1_ctrl_set =
+		(ucontrol->value.integer.value[0] ? true : false);
+
+	if (msm8x16_wcd->ear_2in1_ctrl_set) {
+		if (!gpio_is_valid(pdata->spk_ext_pa_gpio)) {
+			pr_err("%s: Invalid gpio: %d\n", __func__, pdata->spk_ext_pa_gpio);
+			return false;
+		}
+		//aw87318 mode8
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 1);
+
+		pr_debug("%s enable\n", __func__);
+	} else {
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
+		pr_debug("%s disable\n", __func__);
+	}
+	return 0;
+}
+
+// add wenchao
+static int msm_anlg_cdc_free_call_get(struct snd_kcontrol *kcontrol,
+				struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
+	struct sdm660_cdc_priv *msm8x16_wcd = snd_soc_codec_get_drvdata(codec);
+
+	ucontrol->value.integer.value[0] =
+		(msm8x16_wcd->free_call_ctrl_set ? 1 : 0);
+	dev_dbg(codec->dev, "%s: msm8x16_wcd->free_call_ctrl_set = %d\n",
+			__func__, msm8x16_wcd->free_call_ctrl_set);
+	return 0;
+}
+
+static int msm_anlg_cdc_free_call_set(struct snd_kcontrol *kcontrol,
+				struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
+	struct sdm660_cdc_priv *msm8x16_wcd = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_card *card = codec->component.card;
+	struct msm_asoc_mach_data *pdata = snd_soc_card_get_drvdata(card);
+
+	dev_dbg(codec->dev, "%s: ucontrol->value.integer.value[0] = %ld\n",
+		__func__, ucontrol->value.integer.value[0]);
+
+	msm8x16_wcd->free_call_ctrl_set =
+		(ucontrol->value.integer.value[0] ? true : false);
+
+	if (msm8x16_wcd->free_call_ctrl_set) {
+		if (!gpio_is_valid(pdata->spk_ext_pa1_gpio)) {
+			pr_err("%s: Invalid gpio: %d\n", __func__, pdata->spk_ext_pa1_gpio);
+			return false;
+		}
+		//aw87318 mode5
+		gpio_direction_output(pdata->spk_ext_pa1_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa1_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa1_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa1_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa1_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa1_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa1_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa1_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa1_gpio, 1);
+
+		pr_debug("%s enable\n", __func__);
+	} else {
+		gpio_direction_output(pdata->spk_ext_pa1_gpio, 0);
+		pr_debug("%s disable\n", __func__);
+	}
+	return 0;
+}
+#endif
+
 static int msm_anlg_cdc_pa_gain_put(struct snd_kcontrol *kcontrol,
 				    struct snd_ctl_elem_value *ucontrol)
 {
@@ -1884,6 +2023,20 @@ static const struct soc_enum msm_anlg_cdc_ear_pa_gain_enum[] = {
 		SOC_ENUM_SINGLE_EXT(4, msm_anlg_cdc_ear_pa_gain_text),
 };
 
+#ifdef CONFIG_MACH_TENOR_G
+static const char * const msm_anlg_cdc_ear_2in1_ctrl_text[] = {
+		"DISABLE", "ENABLE"};
+static const struct soc_enum msm_anlg_cdc_ear_2in1_ctrl_enum[] = {
+		SOC_ENUM_SINGLE_EXT(2, msm_anlg_cdc_ear_2in1_ctrl_text),
+};
+
+static const char * const msm_anlg_cdc_free_call_ctrl_text[] = {
+		"DISABLE", "ENABLE"};
+static const struct soc_enum msm_anlg_cdc_free_call_ctrl_enum[] = {
+		SOC_ENUM_SINGLE_EXT(2, msm_anlg_cdc_free_call_ctrl_text),
+};
+#endif
+
 static const char * const msm_anlg_cdc_boost_option_ctrl_text[] = {
 		"BOOST_SWITCH", "BOOST_ALWAYS", "BYPASS_ALWAYS",
 		"BOOST_ON_FOREVER"};
@@ -1928,6 +2081,14 @@ static const struct snd_kcontrol_new msm_anlg_cdc_snd_controls[] = {
 
 	SOC_ENUM_EXT("EAR PA Gain", msm_anlg_cdc_ear_pa_gain_enum[0],
 		msm_anlg_cdc_pa_gain_get, msm_anlg_cdc_pa_gain_put),
+
+#ifdef CONFIG_MACH_TENOR_G
+	SOC_ENUM_EXT("EAR 2IN1 Ctrl", msm_anlg_cdc_ear_2in1_ctrl_enum[0],
+		msm_anlg_cdc_ear_2in1_get, msm_anlg_cdc_ear_2in1_set),
+
+	SOC_ENUM_EXT("FREE CALL Ctrl", msm_anlg_cdc_free_call_ctrl_enum[0],
+		msm_anlg_cdc_free_call_get, msm_anlg_cdc_free_call_set),
+#endif
 
 	SOC_ENUM_EXT("Speaker Boost", msm_anlg_cdc_spk_boost_ctl_enum[0],
 		msm_anlg_cdc_spk_boost_get, msm_anlg_cdc_spk_boost_set),
@@ -2861,6 +3022,10 @@ static int msm_anlg_cdc_lo_dac_event(struct snd_soc_dapm_widget *w,
 			MSM89XX_PMIC_ANALOG_RX_LO_DAC_CTL, 0x80, 0x80);
 		snd_soc_update_bits(codec,
 			MSM89XX_PMIC_ANALOG_RX_LO_DAC_CTL, 0x08, 0x00);
+#ifdef CONFIG_MACH_TENOR_G
+		snd_soc_update_bits(codec,
+			MSM89XX_PMIC_ANALOG_RX_LO_EN_CTL, 0x40, 0x40);
+#endif
 		break;
 	case SND_SOC_DAPM_POST_PMD:
 		/* Wait for 20ms before powerdown of lineout_dac */
@@ -2873,6 +3038,10 @@ static int msm_anlg_cdc_lo_dac_event(struct snd_soc_dapm_widget *w,
 			MSM89XX_PMIC_ANALOG_RX_LO_DAC_CTL, 0x08, 0x00);
 		snd_soc_update_bits(codec,
 			MSM89XX_PMIC_ANALOG_RX_LO_EN_CTL, 0x80, 0x00);
+#ifdef CONFIG_MACH_TENOR_G
+		snd_soc_update_bits(codec,
+			MSM89XX_PMIC_ANALOG_RX_LO_EN_CTL, 0x40, 0x00);
+#endif
 		snd_soc_update_bits(codec,
 			MSM89XX_PMIC_ANALOG_RX_LO_EN_CTL, 0x20, 0x00);
 		snd_soc_update_bits(codec,
