@@ -204,6 +204,10 @@ struct sdm660_cdc_priv {
 	bool spk_boost_set;
 	bool ear_pa_boost_set;
 	bool ext_spk_boost_set;
+#ifdef CONFIG_MACH_TENOR_G
+	bool ear_2in1_ctrl_set;
+	bool free_call_ctrl_set;
+#endif
 	struct on_demand_supply on_demand_list[ON_DEMAND_SUPPLIES_MAX];
 	struct regulator *spkdrv_reg;
 	struct blocking_notifier_head notifier_mbhc;
