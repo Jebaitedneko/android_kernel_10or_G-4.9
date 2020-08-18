@@ -13,7 +13,7 @@
 
 &int_codec {
 
-	status = "ok";
+	status = "okay";
 
 	qcom,msm-ext-pa = "primary";
 	qcom,msm-spk-ext-pa = <&tlmm 20 0>;

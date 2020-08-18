@@ -107,7 +107,7 @@
 
 	eeprom1: qcom,eeprom@1 {
 
-		status = "ok";
+		status = "okay";
 
 		cell-index = <1>;
 		compatible = "qcom,eeprom";
@@ -198,7 +198,7 @@
 
 	qcom,camera@1 {
 
-		status = "ok";
+		status = "okay";
 
 		qcom,csiphy-sd-index = <0>;
 		qcom,csid-sd-index = <0>;
