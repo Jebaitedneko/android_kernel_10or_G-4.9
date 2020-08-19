@@ -195,6 +195,7 @@ static void sort_and_kill_tasks(struct task_struct *tasks_to_kill[], int tsi)
 	 *
 	 * TODO: Use sort() next time?
 	 */
+	rcu_read_lock();
 	for (i = 0; i < tsi; i++) {
 		for (j = i + 1; j < tsi; j++) {
 
@@ -208,6 +209,7 @@ static void sort_and_kill_tasks(struct task_struct *tasks_to_kill[], int tsi)
 			}
 		}
 	}
+	rcu_read_unlock();
 
 	/* We kill tasks with the lowest (stime+utime) */
 	while (tsi--) {
@@ -287,7 +289,7 @@ static void swap_fn(struct work_struct *work)
 			continue;
 
 		oom_score_adj = p->signal->oom_score_adj;
-		if (score_adj_check(oom_score_adj)) {
+		if (score_adj_check(oom_score_adj) || oom_score_adj < 0) {
 			task_unlock(p);
 			continue;
 		}
@@ -330,24 +332,27 @@ static void swap_fn(struct work_struct *work)
 	rcu_read_unlock();
 
 	while (si--) {
-		nr_to_reclaim =
-			(selected[si].tasksize * pr_per_swap_size) / total_sz;
-
-		/* scan atleast a page */
-		if (!nr_to_reclaim)
-			nr_to_reclaim = 1;
-
-		rp = reclaim_task_anon(selected[si].p, nr_to_reclaim);
-
-		total_scan += rp.nr_scanned;
-		total_reclaimed += rp.nr_reclaimed;
-
+		
 		if (is_low_mem() > LOWMEM_NONE &&
-				selected[si].oom_score_adj > score_kill_limit) {
+			selected[si].oom_score_adj > score_kill_limit) {
+			
 			tasks_to_kill[tsi] = selected[si].p;
 			tsi += 1;
 
 		} else {
+		
+			nr_to_reclaim =
+			(selected[si].tasksize * pr_per_swap_size) / total_sz;
+
+			/* scan atleast a page */
+			if (!nr_to_reclaim)
+				nr_to_reclaim = 1;
+
+			rp = reclaim_task_anon(selected[si].p, nr_to_reclaim);
+
+			total_scan += rp.nr_scanned;
+			total_reclaimed += rp.nr_reclaimed;
+
 			put_task_struct(selected[si].p);
 		}
 	}
