@@ -51,12 +51,12 @@
 #define FTS_VENDOR_1	0x3b
 #define FTS_VENDOR_2	0x51
 static unsigned char firmware_data_vendor1[] = {
-	#include "HQ_AL1512_C6_FT5435_Biel0x3b_Ver0a_20170119_app.i"
+	#include "HQ_AL1512_C6_FT5435_Biel0x3b_Ver0a_20170119_app.fw"
 };
 
 static unsigned char firmware_data_vendor2[] = {
 
-	#include "HQ_AL1512_C6_FT5435_Ofilm0x51_Ver0a_20170119_app.i"
+	#include "HQ_AL1512_C6_FT5435_Ofilm0x51_Ver0a_20170119_app.fw"
 };
 #endif
 #define TCT_KEY_BACK  158
