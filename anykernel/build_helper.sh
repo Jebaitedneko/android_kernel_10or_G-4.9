@@ -1,58 +1,52 @@
 #!/bin/bash
 
-configdir=$(pwd)/arch/arm64/configs
-
-CFG=msm8953-perf_defconfig
-
-tcdir=${HOME}/android/TOOLS/proton-clang
-
-[ -d $tcdir ] \
-&& echo -e "\nProton-Clang Present.\n" \
-|| echo -e "\nProton-Clang Not Present. Downloading Around 500MB...\n" \
-| mkdir -p $tcdir \
-| git clone --depth=1 https://github.com/kdrag0n/proton-clang $tcdir \
-| echo "Done."
-
-echo -e "\nChecking Clang Version...\n"
-PATH="$tcdir/bin:${PATH}" \
-clang --version
-echo -e "\n"
-
 [ -f ~/.bashrc ] && source ~/.bashrc
 [ -f ~/.bash_profile ] && source ~/.bash_profile
 [ -f ~/.profile ] && source ~/.profile
 
 export LC_ALL=C && export USE_CCACHE=1
 ccache -M 100G
+
+[ -d out ] && rm -rf out && mkdir -p out || mkdir -p out
+
+CFG_DIR=$(pwd)/arch/arm64/configs
+
+CFG=$CFG_DIR/msm8953-perf_defconfig
+
+TC_DIR=${HOME}/android/TOOLS/proton-clang
+
+[ -d $TC_DIR ] \
+&& echo -e "\nProton-Clang Present.\n" \
+|| echo -e "\nProton-Clang Not Present. Downloading Around 500MB...\n" \
+| mkdir -p $TC_DIR \
+| git clone --depth=1 https://github.com/kdrag0n/proton-clang $TC_DIR \
+| echo "Done."
+
+echo -e "\nChecking Clang Version...\n"
+PATH="$TC_DIR/bin:${PATH}" \
+clang --version
+echo -e "\n"
 echo -e "\nStarting Build...\n"
 
-[ -d out ] && rm -rf out || mkdir -p out
-
-treble() {
-cp $configdir/$CFG $configdir/g_treble_defconfig
-}
+cp $CFG $CFG_DIR/final_defconfig
 
 nontreble() {
-cp $configdir/$CFG $configdir/g_nontreble_defconfig
-echo "CONFIG_MACH_NONTREBLE_DTS=y" >> $configdir/g_nontreble_defconfig
-echo "CONFIG_PRONTO_WLAN=m" >> $configdir/g_nontreble_defconfig
+echo "CONFIG_MACH_NONTREBLE_DTS=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_PRONTO_WLAN=m" >> $CFG_DIR/final_defconfig
 }
 
 noslmk() {
-sed -i "/CONFIG_ANDROID_LOW_MEMORY_KILLER/d" $configdir/g_treble_defconfig
-sed -i "/CONFIG_ANDROID_SIMPLE_LMK/d" $configdir/g_treble_defconfig
-sed -i "/CONFIG_ANDROID_SIMPLE_LMK_MINFREE/d" $configdir/g_treble_defconfig
-sed -i "/CONFIG_ANDROID_SIMPLE_LMK_TIMEOUT_MSEC/d" $configdir/g_treble_defconfig
-echo "CONFIG_ANDROID_LOW_MEMORY_KILLER=y" >> $configdir/g_treble_defconfig
-}
-
-rmconf() {
-[ -f $configdir/g_treble_defconfig ] && rm -rf $configdir/g_treble_defconfig
-[ -f $configdir/g_nontreble_defconfig ] && rm -rf $configdir/g_nontreble_defconfig
+sed -i "/CONFIG_ANDROID_LOW_MEMORY_KILLER/d" $CFG_DIR/final_defconfig
+sed -i "/CONFIG_ANDROID_SIMPLE_LMK/d" $CFG_DIR/final_defconfig
+sed -i "/CONFIG_ANDROID_SIMPLE_LMK_MINFREE/d" $CFG_DIR/final_defconfig
+sed -i "/CONFIG_ANDROID_SIMPLE_LMK_TIMEOUT_MSEC/d" $CFG_DIR/final_defconfig
+echo "CONFIG_ANDROID_LOW_MEMORY_KILLER=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_MEMCG=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_MEMCG_SWAP=y" >> $CFG_DIR/final_defconfig
 }
 
 pcmake() {
-PATH="$tcdir/bin:${PATH}" \
+PATH="$TC_DIR/bin:${PATH}" \
 make	\
 	O=out \
 	ARCH=arm64 \
