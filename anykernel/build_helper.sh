@@ -38,6 +38,14 @@ echo "CONFIG_MACH_NONTREBLE_DTS=y" >> $configdir/g_nontreble_defconfig
 echo "CONFIG_PRONTO_WLAN=m" >> $configdir/g_nontreble_defconfig
 }
 
+noslmk() {
+sed -i "/CONFIG_ANDROID_LOW_MEMORY_KILLER/d" $configdir/g_treble_defconfig
+sed -i "/CONFIG_ANDROID_SIMPLE_LMK/d" $configdir/g_treble_defconfig
+sed -i "/CONFIG_ANDROID_SIMPLE_LMK_MINFREE/d" $configdir/g_treble_defconfig
+sed -i "/CONFIG_ANDROID_SIMPLE_LMK_TIMEOUT_MSEC/d" $configdir/g_treble_defconfig
+echo "CONFIG_ANDROID_LOW_MEMORY_KILLER=y" >> $configdir/g_treble_defconfig
+}
+
 rmconf() {
 [ -f $configdir/g_treble_defconfig ] && rm -rf $configdir/g_treble_defconfig
 [ -f $configdir/g_nontreble_defconfig ] && rm -rf $configdir/g_nontreble_defconfig
