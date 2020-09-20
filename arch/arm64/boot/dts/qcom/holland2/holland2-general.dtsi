@@ -92,6 +92,7 @@
 			touchscreen-size-y = <1920>;
 			touchscreen-max-w = <1024>;
 			touchscreen-max-p = <1024>;
+			touchscreen-key-map = <139 172 158>;
 			goodix,type-a-report = <0>;
 			goodix,driver-send-cfg = <1>;
 			goodix,wakeup-with-reset = <0>;
@@ -103,6 +104,7 @@
 			goodix,auto-update = <0>;
 			goodix,auto-update-cfg = <0>;
 			goodix,power-off-sleep = <0>;
+			goodix,slide-wakeup = <1>;
 			goodix,cfg-group0 = [
                         45 38 04 80 07 0A 3C 80 02 C8 28 
                         05 50 37 03 05 00 00 00 00 11 11 
