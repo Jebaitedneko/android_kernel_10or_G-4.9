@@ -800,7 +800,6 @@ static int camera_v4l2_close(struct file *filep)
 
 		/* Enable power collapse latency */
 		msm_pm_qos_update_request(CAMERA_ENABLE_PC_LATENCY);
-		pm_relax(&pvdev->vdev->dev);
 	} else {
 		msm_delete_command_ack_q(pvdev->vdev->num,
 			sp->stream_id);
@@ -810,6 +809,7 @@ static int camera_v4l2_close(struct file *filep)
 		mutex_unlock(&session->close_lock);
 	}
 
+	pm_relax(&pvdev->vdev->dev);
 	camera_v4l2_fh_release(filep);
 	mutex_unlock(&pvdev->video_drvdata_mutex);
 
