@@ -2152,6 +2152,7 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 		goto exit_power_off;
 	}
 
+	device_enable_async_suspend(&client->dev);
 	mutex_init(&ts->lock);
 
 	ret = gtp_request_irq(ts);
