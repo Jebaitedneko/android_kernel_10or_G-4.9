@@ -3793,6 +3793,7 @@ INIT_WORK(&data->work_vr, ft5435_change_vr_switch);
 	}
 	data->family_id = pdata->family_id;
 
+	device_enable_async_suspend(&client->dev);
 	mutex_init(&g_device_mutex);
 
 #if defined(FOCALTECH_PWRON_UPGRADE)
