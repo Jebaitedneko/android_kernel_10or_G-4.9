@@ -55,10 +55,6 @@
 #include "mdp3_ctrl.h"
 #include "mdss_sync.h"
 
-#ifdef CONFIG_KLAPSE
-#include <linux/klapse.h>
-#endif
-
 #ifdef CONFIG_FB_MSM_TRIPLE_BUFFER
 #define MDSS_FB_NUM 3
 #else
@@ -308,9 +304,6 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 							!mfd->bl_level)) {
 		mutex_lock(&mfd->bl_lock);
 		mdss_fb_set_backlight(mfd, bl_lvl);
-#ifdef CONFIG_KLAPSE
-                set_rgb_slider(bl_lvl);
-#endif
 		mutex_unlock(&mfd->bl_lock);
 	}
 }
@@ -3309,7 +3302,7 @@ static int mdss_fb_pan_display_ex(struct fb_info *info,
 	if (var->yoffset > (info->var.yres_virtual - info->var.yres))
 		return -EINVAL;
 
-	ret = mdss_fb_pan_idle(mfd);
+	ret = mdss_fb_wait_for_kickoff(mfd);
 	if (ret) {
 		pr_err("wait_for_kick failed. rc=%d\n", ret);
 		return ret;
