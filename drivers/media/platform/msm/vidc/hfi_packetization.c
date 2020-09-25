@@ -809,10 +809,10 @@ int create_pkt_cmd_session_etb_decoder(
 	pkt->input_tag = input_frame->input_tag;
 	pkt->packet_buffer = (u32)input_frame->device_addr;
 
-	trace_msm_v4l2_vidc_buffer_event_start("ETB",
-		input_frame->device_addr, input_frame->timestamp,
-		input_frame->alloc_len, input_frame->filled_len,
-		input_frame->offset);
+//	trace_msm_v4l2_vidc_buffer_event_start("ETB",
+//		input_frame->device_addr, input_frame->timestamp,
+//		input_frame->alloc_len, input_frame->filled_len,
+//		input_frame->offset);
 
 	if (!pkt->packet_buffer)
 		rc = -EINVAL;
@@ -845,10 +845,10 @@ int create_pkt_cmd_session_etb_encoder(
 	pkt->packet_buffer = (u32)input_frame->device_addr;
 	pkt->extra_data_buffer = (u32)input_frame->extradata_addr;
 
-	trace_msm_v4l2_vidc_buffer_event_start("ETB",
-		input_frame->device_addr, input_frame->timestamp,
-		input_frame->alloc_len, input_frame->filled_len,
-		input_frame->offset);
+//	trace_msm_v4l2_vidc_buffer_event_start("ETB",
+//		input_frame->device_addr, input_frame->timestamp,
+//		input_frame->alloc_len, input_frame->filled_len,
+//		input_frame->offset);
 
 	if (!pkt->packet_buffer)
 		rc = -EINVAL;
@@ -884,10 +884,10 @@ int create_pkt_cmd_session_ftb(struct hfi_cmd_session_fill_buffer_packet *pkt,
 	pkt->offset = output_frame->offset;
 	pkt->rgData[0] = output_frame->extradata_size;
 
-	trace_msm_v4l2_vidc_buffer_event_start("FTB",
-		output_frame->device_addr, output_frame->timestamp,
-		output_frame->alloc_len, output_frame->filled_len,
-		output_frame->offset);
+//	trace_msm_v4l2_vidc_buffer_event_start("FTB",
+//		output_frame->device_addr, output_frame->timestamp,
+//		output_frame->alloc_len, output_frame->filled_len,
+//		output_frame->offset);
 
 	return rc;
 }

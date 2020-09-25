@@ -102,8 +102,8 @@ static int msm_ion_get_device_address(struct smem_client *smem_client,
 		}
 
 		/* debug trace's need to be updated later */
-		trace_msm_smem_buffer_iommu_op_start("MAP", 0, 0,
-			align, *iova, *buffer_size);
+//		trace_msm_smem_buffer_iommu_op_start("MAP", 0, 0,
+//			align, *iova, *buffer_size);
 
 		/* Map a scatterlist into SMMU */
 		if (smem_client->res->sys_cache_present) {
@@ -139,8 +139,8 @@ static int msm_ion_get_device_address(struct smem_client *smem_client,
 		mapping_info->attach = attach;
 		mapping_info->buf = buf;
 
-		trace_msm_smem_buffer_iommu_op_end("MAP", 0, 0,
-			align, *iova, *buffer_size);
+//		trace_msm_smem_buffer_iommu_op_end("MAP", 0, 0,
+//			align, *iova, *buffer_size);
 	} else {
 		dprintk(VIDC_DBG, "Using physical memory address\n");
 		rc = ion_phys(clnt, hndl, iova, (size_t *)buffer_size);
@@ -182,7 +182,7 @@ static int msm_ion_put_device_address(struct smem_client *smem_client,
 	}
 
 	if (is_iommu_present(smem_client->res)) {
-		trace_msm_smem_buffer_iommu_op_start("UNMAP", 0, 0, 0, 0, 0);
+//		trace_msm_smem_buffer_iommu_op_start("UNMAP", 0, 0, 0, 0, 0);
 		msm_dma_unmap_sg(mapping_info->dev, mapping_info->table->sgl,
 			mapping_info->table->nents, DMA_BIDIRECTIONAL,
 			mapping_info->buf);
@@ -190,7 +190,7 @@ static int msm_ion_put_device_address(struct smem_client *smem_client,
 			mapping_info->table, DMA_BIDIRECTIONAL);
 		dma_buf_detach(mapping_info->buf, mapping_info->attach);
 		dma_buf_put(mapping_info->buf);
-		trace_msm_smem_buffer_iommu_op_end("UNMAP", 0, 0, 0, 0, 0);
+//		trace_msm_smem_buffer_iommu_op_end("UNMAP", 0, 0, 0, 0, 0);
 
 		mapping_info->dev = NULL;
 		mapping_info->mapping = NULL;
@@ -534,8 +534,8 @@ static int alloc_ion_mem(struct smem_client *client, size_t size, u32 align,
 		}
 	}
 
-	trace_msm_smem_buffer_ion_op_start("ALLOC", (u32)buffer_type,
-		heap_mask, size, align, flags, map_kernel);
+//	trace_msm_smem_buffer_ion_op_start("ALLOC", (u32)buffer_type,
+//		heap_mask, size, align, flags, map_kernel);
 	hndl = ion_alloc(client->clnt, size, align, heap_mask, ion_flags);
 	if (IS_ERR_OR_NULL(hndl)) {
 		dprintk(VIDC_ERR,
@@ -544,8 +544,8 @@ static int alloc_ion_mem(struct smem_client *client, size_t size, u32 align,
 		rc = -ENOMEM;
 		goto fail_shared_mem_alloc;
 	}
-	trace_msm_smem_buffer_ion_op_end("ALLOC", (u32)buffer_type,
-		heap_mask, size, align, flags, map_kernel);
+//	trace_msm_smem_buffer_ion_op_end("ALLOC", (u32)buffer_type,
+//		heap_mask, size, align, flags, map_kernel);
 
 	mem->handle = hndl;
 	mem->flags = flags;
@@ -619,13 +619,13 @@ static int free_ion_mem(struct smem_client *client, struct msm_smem *mem)
 	}
 
 	if (mem->handle) {
-		trace_msm_smem_buffer_ion_op_start("FREE",
-				(u32)mem->buffer_type, -1, mem->size, -1,
-				mem->flags, -1);
+//		trace_msm_smem_buffer_ion_op_start("FREE",
+//				(u32)mem->buffer_type, -1, mem->size, -1,
+//				mem->flags, -1);
 		ion_free(client->clnt, mem->handle);
 		mem->handle = NULL;
-		trace_msm_smem_buffer_ion_op_end("FREE", (u32)mem->buffer_type,
-			-1, mem->size, -1, mem->flags, -1);
+//		trace_msm_smem_buffer_ion_op_end("FREE", (u32)mem->buffer_type,
+//			-1, mem->size, -1, mem->flags, -1);
 	}
 
 	return rc;
