@@ -3228,7 +3228,7 @@ static const struct snd_soc_dapm_route audio_map[] = {
 	{"LINE_OUT", "Switch", "LINEOUT DAC"},
 	{"LINEOUT DAC", NULL, "PDM_IN_RX3"},
 #ifdef CONFIG_MACH_TENOR_G
-	{ "Ext Spk", NULL, "LINEOUT PA"},
+	{"Ext Spk", NULL, "Ext Spk Switch"},
 	{"Ext Spk Switch", "On", "HPHL PA"},
 	{"Ext Spk Switch", "On", "HPHR PA"},
 #endif
