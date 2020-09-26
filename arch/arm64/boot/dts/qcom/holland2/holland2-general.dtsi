@@ -87,7 +87,7 @@
 			reset-gpios = <&tlmm 64 0x00>;
 			irq-gpios = <&tlmm 65 0x2008>;
 			irq-flags = <2>;
-			touchscreen-max-id = <10>;
+			touchscreen-max-id = <5>;
 			touchscreen-size-x = <1080>;
 			touchscreen-size-y = <1920>;
 			touchscreen-max-w = <1024>;
