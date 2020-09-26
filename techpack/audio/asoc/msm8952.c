@@ -88,8 +88,8 @@ static struct wcd_mbhc_config mbhc_cfg = {
 	.hs_ext_micbias = false,
 	.key_code[0] = KEY_MEDIA,
 #ifdef CONFIG_MACH_TENOR_G
-	.key_code[1] = BTN_1,
-	.key_code[2] = BTN_2,
+	.key_code[1] = KEY_VOLUMEUP,
+	.key_code[2] = KEY_VOLUMEDOWN,
 	.key_code[3] = 0,
 #else
 	.key_code[1] = KEY_VOICECOMMAND,
@@ -1611,16 +1611,16 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 	 * 360-680 == Button 3
 	 */
 #if defined(CONFIG_MACH_TENOR_G)
-	btn_low[0] = 73;
-	btn_high[0] = 73;
-	btn_low[1] = 233;
-	btn_high[1] = 233;
-	btn_low[2] = 438;
-	btn_high[2] = 438;
-	btn_low[3] = 438;
-	btn_high[3] = 438;
-	btn_low[4] = 438;
-	btn_high[4] = 438;
+	btn_low[0] = 80;
+	btn_high[0] = 80;
+	btn_low[1] = 220;
+	btn_high[1] = 220;
+	btn_low[2] = 350;
+	btn_high[2] = 450;
+	btn_low[3] = 350;
+	btn_high[3] = 450;
+	btn_low[4] = 350;
+	btn_high[4] = 450;
 #else
 	btn_low[0] = 75;
 	btn_high[0] = 75;
