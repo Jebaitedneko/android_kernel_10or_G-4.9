@@ -96,6 +96,8 @@
 			qcom,skip-usb-suspend-for-fake-battery;
 			qcom,thermal-mitigation = <2100 1800 1500 1200 900 600 300 0>;
 			qcom,float-voltage-mv-ntc = <4100>;
+			qcom,chg-led-sw-controls;
+			qcom,chg-led-support;
 
 			/delete-property/ qcom,external-typec;
 			/delete-property/ qcom,fastchg-current-comp;
