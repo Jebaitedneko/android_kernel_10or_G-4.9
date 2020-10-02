@@ -45,6 +45,10 @@ echo "CONFIG_MEMCG=y" >> $CFG_DIR/final_defconfig
 echo "CONFIG_MEMCG_SWAP=y" >> $CFG_DIR/final_defconfig
 }
 
+full_lto() {
+echo "CONFIG_LTO_CLANG=y" >> $CFG_DIR/final_defconfig
+}
+
 pcmake() {
 PATH="$TC_DIR/bin:${PATH}" \
 make	\
