@@ -1,8 +1,9 @@
 /*
  * platform indepent driver interface
  *
- * Coypritht (c) 2017 Goodix
+ * Coypright (c) 2017 Goodix
  */
+
 #include <linux/delay.h>
 #include <linux/workqueue.h>
 #include <linux/of_gpio.h>
@@ -10,15 +11,8 @@
 #include <linux/regulator/consumer.h>
 #include <linux/timer.h>
 #include <linux/err.h>
-
 #include "gf_spi.h"
-
-#if defined(USE_SPI_BUS)
-#include <linux/spi/spi.h>
-#include <linux/spi/spidev.h>
-#elif defined(USE_PLATFORM_BUS)
 #include <linux/platform_device.h>
-#endif
 
 int gf_parse_dts(struct gf_dev* gf_dev)
 {
