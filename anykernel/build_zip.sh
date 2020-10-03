@@ -18,7 +18,7 @@ cp $image ./Image.gz-dtb
 mv Image.gz-dtb ./ak_dir_working && cd ak_dir_working
 
 treble() {
-zip -r ${pre}_BOOT_MOCHI_TREBLE_${fmt}.zip . -x '*.git*'
+zip -r ${pre}_BOOT_MOCHI_TREBLE_${fmt}.zip . -x '*.git*' '*modules*' '*patch*' '*ramdisk*' 'LICENSE' 'README.md'
 mv *.zip ../out
 cd ..
 rm -rf ak_dir_working
@@ -27,7 +27,7 @@ rm -rf ak_dir_working
 nontreble() {
 sed -i '/patch_cmdline firmware/d' anykernel.sh
 
-zip -r ${pre}_BOOT_MOCHI_NON_TREBLE_${fmt}.zip . -x '*.git*'
+zip -r ${pre}_BOOT_MOCHI_NON_TREBLE_${fmt}.zip . -x '*.git*' '*modules*' '*patch*' '*ramdisk*' 'LICENSE' 'README.md'
 mv *.zip ../out
 cd ..
 rm -rf ak_dir_working
@@ -37,7 +37,7 @@ cd $kernel_dir/modules
 find -iname "wlan.ko" -exec cp {} ../$pronto_dir/vendor/lib/modules/wlan.ko \;
 
 cd ../$pronto_dir
-zip -r ${pre}_PRONTO_WLAN_NON_TREBLE_${fmt}.zip . -x '*.git*'
+zip -r ${pre}_PRONTO_WLAN_NON_TREBLE_${fmt}.zip . -x '*.git*' '*modules*' '*patch*' '*ramdisk*' 'LICENSE' 'README.md'
 mv *.zip ../../out
 cd ../../ && rm -rf $pronto_dir
 }
