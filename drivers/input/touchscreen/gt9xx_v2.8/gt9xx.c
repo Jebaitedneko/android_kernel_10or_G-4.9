@@ -31,8 +31,11 @@
 #define GOODIX_COORDS_ARR_SIZE	4
 #define PROP_NAME_SIZE		24
 #define I2C_MAX_TRANSFER_SIZE   255
+
+#ifdef GTP_PEN_MODE
 #define GTP_PEN_BUTTON1		BTN_STYLUS
 #define GTP_PEN_BUTTON2		BTN_STYLUS2
+#endif
 
 static const char *goodix_ts_name = "goodix-ts";
 static const char *goodix_input_phys = "input/ts";
@@ -414,6 +417,7 @@ static u8 gtp_get_points(struct goodix_ts_data *ts,
 		dev_dbg(&ts->client->dev, "[%d][%d %d %d]\n",
 			points[i].id, points[i].x, points[i].y, points[i].p);
 
+#ifdef GTP_PEN_MODE
 		/* pen device coordinate */
 		if (points[i].id & 0x80) {
 			points[i].tool_type = GTP_TOOL_PEN;
@@ -429,6 +433,10 @@ static u8 gtp_get_points(struct goodix_ts_data *ts,
 		} else {
 			points[i].tool_type = GTP_TOOL_FINGER;
 		}
+#else
+			points[i].tool_type = GTP_TOOL_FINGER;
+#endif
+
 	}
 
 exit_get_point:
@@ -446,7 +454,10 @@ static void gtp_type_a_report(struct goodix_ts_data *ts, u8 touch_num,
 	int i;
 	u16 cur_touch = 0;
 	static u16 pre_touch;
+
+#ifdef GTP_PEN_MODE
 	static u8 pre_pen_id;
+#endif
 
 	if (touch_num)
 		input_report_key(ts->input_dev, BTN_TOUCH, 1);
@@ -456,6 +467,7 @@ static void gtp_type_a_report(struct goodix_ts_data *ts, u8 touch_num,
 			input_report_abs(ts->input_dev,
 					ABS_MT_TRACKING_ID, points->id);
 
+#ifdef GTP_PEN_MODE
 			if (points->tool_type == GTP_TOOL_PEN) {
 				input_report_key(ts->input_dev,
 							BTN_TOOL_PEN, true);
@@ -464,6 +476,10 @@ static void gtp_type_a_report(struct goodix_ts_data *ts, u8 touch_num,
 				input_report_key(ts->input_dev,
 							BTN_TOOL_FINGER, true);
 			}
+#else
+				input_report_key(ts->input_dev,
+							BTN_TOOL_FINGER, true);
+#endif
 			input_report_abs(ts->input_dev, ABS_MT_POSITION_X,
 					 points->x);
 			input_report_abs(ts->input_dev, ABS_MT_POSITION_Y,
@@ -477,6 +493,8 @@ static void gtp_type_a_report(struct goodix_ts_data *ts, u8 touch_num,
 			cur_touch |= 0x01 << points->id;
 			points++;
 		} else if (pre_touch & 0x01 << i) {
+
+#ifdef GTP_PEN_MODE
 			if (pre_pen_id == i) {
 				input_report_key(ts->input_dev,
 							BTN_TOOL_PEN, false);
@@ -486,6 +504,10 @@ static void gtp_type_a_report(struct goodix_ts_data *ts, u8 touch_num,
 				input_report_key(ts->input_dev,
 					BTN_TOOL_FINGER, false);
 			}
+#else
+				input_report_key(ts->input_dev,
+					BTN_TOOL_FINGER, false);
+#endif
 		}
 	}
 
@@ -503,12 +525,16 @@ static void gtp_mt_slot_report(struct goodix_ts_data *ts, u8 touch_num,
 	int i;
 	u16 cur_touch = 0;
 	static u16 pre_touch;
+
+#ifdef GTP_PEN_MODE
 	static u8 pre_pen_id;
+#endif
 
 	for (i = 0; i < ts->pdata->max_touch_id; i++) {
 		if (touch_num && i == points->id) {
 			input_mt_slot(ts->input_dev, points->id);
 
+#ifdef GTP_PEN_MODE
 			if (points->tool_type == GTP_TOOL_PEN) {
 				input_mt_report_slot_state(ts->input_dev,
 							   MT_TOOL_PEN, true);
@@ -517,6 +543,10 @@ static void gtp_mt_slot_report(struct goodix_ts_data *ts, u8 touch_num,
 				input_mt_report_slot_state(ts->input_dev,
 						MT_TOOL_FINGER, true);
 			}
+#else
+				input_mt_report_slot_state(ts->input_dev,
+						MT_TOOL_FINGER, true);
+#endif
 			input_report_abs(ts->input_dev, ABS_MT_POSITION_X,
 					 points->x);
 			input_report_abs(ts->input_dev, ABS_MT_POSITION_Y,
@@ -530,6 +560,8 @@ static void gtp_mt_slot_report(struct goodix_ts_data *ts, u8 touch_num,
 			points++;
 		} else if (pre_touch & 0x01 << i) {
 			input_mt_slot(ts->input_dev, i);
+
+#ifdef GTP_PEN_MODE
 			if (pre_pen_id == i) {
 				input_mt_report_slot_state(ts->input_dev,
 							   MT_TOOL_PEN, false);
@@ -541,6 +573,10 @@ static void gtp_mt_slot_report(struct goodix_ts_data *ts, u8 touch_num,
 				input_mt_report_slot_state(ts->input_dev,
 						MT_TOOL_FINGER, false);
 			}
+#else
+				input_mt_report_slot_state(ts->input_dev,
+						MT_TOOL_FINGER, false);
+#endif
 		}
 	}
 
@@ -587,6 +623,7 @@ static void gtp_work_func(struct goodix_ts_data *ts)
 		return;
 	}
 
+#ifdef GTP_PEN_MODE
 	/* touch key event */
 	if (key_value & 0xf0 || pre_key & 0xf0) {
 		/* pen button */
@@ -613,6 +650,11 @@ static void gtp_work_func(struct goodix_ts_data *ts)
 		input_sync(ts->input_dev);
 		pre_key = key_value;
 	} else if (key_value & 0x0f || pre_key & 0x0f) {
+#endif
+
+#ifndef GTP_PEN_MODE
+	if (key_value & 0x0f || pre_key & 0x0f) {
+#endif
 		/* panel key */
 		for (i = 0; i < ts->pdata->key_nums; i++) {
 			if ((pre_key | key_value) & (0x01 << i))
@@ -1628,8 +1670,10 @@ static s8 gtp_request_input_dev(struct goodix_ts_data *ts)
 		dev_info(&ts->client->dev, "Use type A report protocol\n");
 	}
 
+#ifdef GTP_PEN_MODE
 	input_set_capability(ts->input_dev, EV_KEY, GTP_PEN_BUTTON1);
 	input_set_capability(ts->input_dev, EV_KEY, GTP_PEN_BUTTON2);
+#endif
 
 	/* touch key register */
 	for (index = 0; index < ts->pdata->key_nums; index++)
@@ -1656,7 +1700,11 @@ static s8 gtp_request_input_dev(struct goodix_ts_data *ts)
 		input_set_abs_params(ts->input_dev, ABS_MT_TOOL_TYPE,
 				     0, MT_TOOL_MAX, 0, 0);
 	} else {
+
+#ifdef GTP_PEN_MODE
 		__set_bit(BTN_TOOL_PEN, ts->input_dev->keybit);
+#endif
+
 		__set_bit(BTN_TOOL_FINGER, ts->input_dev->keybit);
 	}
 
@@ -1790,10 +1838,12 @@ static int gtp_parse_dt(struct device *dev,
 	if (pdata->power_off_sleep)
 		dev_info(dev, "power-off-sleep enabled\n");
 
+#ifdef GTP_PEN_MODE
 	of_property_read_u32(np, "goodix,pen-suppress-finger",
 			     &pdata->pen_suppress_finger);
 	if (pdata->pen_suppress_finger)
 		dev_info(dev, "pen-suppress-finger enabled\n");
+#endif
 
 	prop = of_find_property(np, "touchscreen-key-map", NULL);
 	if (prop) {
