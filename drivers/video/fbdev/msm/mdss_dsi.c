@@ -2846,7 +2846,9 @@ static int mdss_dsi_event_handler(struct mdss_panel_data *pdata,
 		rc = mdss_dsi_panel_timing_switch(ctrl_pdata, arg);
 		break;
 	case MDSS_EVENT_FB_REGISTERED:
+		#ifdef CONFIG_DEBUG_FS
 		mdss_dsi_debugfs_init(ctrl_pdata);
+		#endif
 
 		fbi = (struct fb_info *)arg;
 		if (!fbi || !fbi->dev)
@@ -3953,7 +3955,9 @@ static int mdss_dsi_ctrl_remove(struct platform_device *pdev)
 	msm_mdss_iounmap(&ctrl_pdata->mmss_misc_io);
 	msm_mdss_iounmap(&ctrl_pdata->phy_io);
 	msm_mdss_iounmap(&ctrl_pdata->ctrl_io);
+	#ifdef CONFIG_DEBUG_FS
 	mdss_dsi_debugfs_cleanup(ctrl_pdata);
+	#endif
 
 	if (ctrl_pdata->workq)
 		destroy_workqueue(ctrl_pdata->workq);
