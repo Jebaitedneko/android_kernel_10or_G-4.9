@@ -51,7 +51,7 @@
 #define VER_MINOR   2
 #define PATCH_LEVEL 11
 
-#define	WAKELOCK_HOLD_TIME	100 /* in ms */
+#define	WAKELOCK_HOLD_TIME	250 /* in ms */
 #define	GF_SPIDEV_NAME		"goodix,fingerprint"
 #define	GF_DEV_NAME			"goodix_fp"
 #define	GF_INPUT_NAME		"qwerty"
