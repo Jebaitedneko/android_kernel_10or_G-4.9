@@ -3805,7 +3805,7 @@ INIT_WORK(&data->work_vr, ft5435_change_vr_switch);
 #endif
 	err = request_threaded_irq(client->irq, NULL,
 				ft5435_ts_interrupt,
-				pdata->irqflags | IRQF_ONESHOT|IRQF_TRIGGER_FALLING,
+				pdata->irqflags | IRQF_ONESHOT | IRQF_TRIGGER_FALLING | IRQF_PERF_CRITICAL,
 				client->dev.driver->name, data);
 	if (err) {
 		dev_err(&client->dev, "request irq failed\n");
