@@ -2592,6 +2592,7 @@ static ssize_t ft5435_fw_version_store(struct device *dev,
 static DEVICE_ATTR(fw_version, 0664, ft5435_fw_version_show, ft5435_fw_version_store);
 
 
+#ifdef CONFIG_DEBUG_FS
 static bool ft5435_debug_addr_is_valid(int addr)
 {
 	if (addr < 0 || addr > 0xFF) {
@@ -2723,6 +2724,7 @@ static const struct file_operations debug_dump_info_fops = {
 	.read		= seq_read,
 	.release	= single_release,
 };
+#endif
 
 #ifdef CONFIG_OF
 static int ft5435_get_dt_coords(struct device *dev, char *name,
@@ -3845,6 +3847,8 @@ INIT_WORK(&data->work_vr, ft5435_change_vr_switch);
 		goto free_set_cover_mode;
 	}
 #endif
+
+#ifdef CONFIG_DEBUG_FS
 	data->dir = debugfs_create_dir(FT_DEBUG_DIR_NAME, NULL);
 	if (data->dir == NULL || IS_ERR(data->dir)) {
 		pr_err("debugfs_create_dir failed(%ld)\n", PTR_ERR(data->dir));
@@ -3883,12 +3887,15 @@ INIT_WORK(&data->work_vr, ft5435_change_vr_switch);
 		err = PTR_ERR(temp);
 		goto free_debug_dir;
 	}
+#endif
 
 	data->ts_info = devm_kzalloc(&client->dev,
 				FT_INFO_MAX_LEN, GFP_KERNEL);
 	if (!data->ts_info) {
 		dev_err(&client->dev, "Not enough memory\n");
+#ifdef CONFIG_DEBUG_FS
 		goto free_debug_dir;
+#endif
 	}
 
 	/*get some register information */
@@ -4033,10 +4040,12 @@ g_ft5435_ts_data = data;
 	printk("~~~~~ ft5435_ts_probe end\n");
 	return 0;
 
+#ifdef CONFIG_DEBUG_FS
 free_debug_dir:
 	debugfs_remove_recursive(data->dir);
 free_force_update_fw_sys:
 	device_remove_file(&client->dev, &dev_attr_force_update_fw);
+#endif
 free_update_fw_sys:
 	device_remove_file(&client->dev, &dev_attr_update_fw);
 
@@ -4098,7 +4107,9 @@ static int ft5435_ts_remove(struct i2c_client *client)
 	struct ft5435_ts_data *data = i2c_get_clientdata(client);
 	int retval;
 
+#ifdef CONFIG_DEBUG_FS
 	debugfs_remove_recursive(data->dir);
+#endif
 	device_remove_file(&client->dev, &dev_attr_force_update_fw);
 	device_remove_file(&client->dev, &dev_attr_update_fw);
 	device_remove_file(&client->dev, &dev_attr_fw_name);
