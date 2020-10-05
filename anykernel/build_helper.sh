@@ -4,7 +4,7 @@
 [ -f ~/.bash_profile ] && source ~/.bash_profile
 [ -f ~/.profile ] && source ~/.profile
 
-export LC_ALL=C && export USE_CCACHE=1
+export USE_CCACHE=1
 ccache -M 100G
 
 [ -d out ] && rm -rf out && mkdir -p out || mkdir -p out
@@ -47,6 +47,11 @@ echo "CONFIG_MEMCG_SWAP=y" >> $CFG_DIR/final_defconfig
 
 full_lto() {
 echo "CONFIG_LTO_CLANG=y" >> $CFG_DIR/final_defconfig
+}
+
+thin_lto() {
+full_lto
+echo "CONFIG_THINLTO=y" >> $CFG_DIR/final_defconfig
 }
 
 pcmake() {

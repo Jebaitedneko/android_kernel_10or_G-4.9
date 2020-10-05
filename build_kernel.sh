@@ -7,6 +7,7 @@ source anykernel/build_helper.sh
 [[ $1 == 'n' || $1 == 'dn'  ]] && nontreble
 [[ $2 == 's'                ]] && noslmk
 [[ $2 == 'flto'             ]] && full_lto
+[[ $2 == 'tlto'             ]] && thin_lto
 
 BUILD_START=$(date +"%s")
 make O=out ARCH=arm64 final_defconfig
