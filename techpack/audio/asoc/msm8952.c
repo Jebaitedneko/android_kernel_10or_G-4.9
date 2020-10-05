@@ -1611,16 +1611,16 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 	 * 360-680 == Button 3
 	 */
 #if defined(CONFIG_MACH_TENOR_G)
-	btn_low[0] = 75;
-	btn_high[0] = 75;
-	btn_low[1] = 200;
-	btn_high[1] = 190;
-	btn_low[2] = 325;
-	btn_high[2] = 420;
-	btn_low[3] = 325;
-	btn_high[3] = 420;
-	btn_low[4] = 325;
-	btn_high[4] = 420;
+	btn_low[0] = 80;
+	btn_high[0] = 80;
+	btn_low[1] = 220;
+	btn_high[1] = 220;
+	btn_low[2] = 350;
+	btn_high[2] = 450;
+	btn_low[3] = 350;
+	btn_high[3] = 450;
+	btn_low[4] = 350;
+	btn_high[4] = 450;
 #else
 	btn_low[0] = 75;
 	btn_high[0] = 75;
