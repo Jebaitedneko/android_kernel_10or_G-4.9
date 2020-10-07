@@ -15,6 +15,8 @@
 
 	i2c@78b7000 { /* BLSP1 QUP3 */
 
+		qcom,clk-freq-out = <1000000>;
+
 		status = "okay";
 
 		focaltech@38 {
