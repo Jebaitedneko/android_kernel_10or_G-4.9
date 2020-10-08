@@ -87,7 +87,7 @@ static struct wcd_mbhc_config mbhc_cfg = {
 	.swap_gnd_mic = NULL,
 	.hs_ext_micbias = false,
 	.key_code[0] = KEY_MEDIA,
-#ifdef CONFIG_MACH_TENOR_G
+#if (defined CONFIG_MACH_TENOR_G) || (defined CONFIG_MACH_TENOR_E)
 	.key_code[1] = KEY_VOLUMEUP,
 	.key_code[2] = KEY_VOLUMEDOWN,
 	.key_code[3] = 0,
@@ -393,6 +393,7 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 		enable ? "Enable" : "Disable");
 
 	if (enable) {
+#if (defined CONFIG_MACH_TENOR_G) || (defined CONFIG_MACH_TENOR_E)
 #ifdef CONFIG_MACH_TENOR_G
 		while (pa_mode > 0) {
 			gpio_set_value_cansleep(pdata->spk_ext_pa_gpio, 0);
@@ -405,7 +406,20 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 			udelay(2);
 			pa_mode--;
 		}
-#else
+#endif
+#ifdef CONFIG_MACH_TENOR_E
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 1);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
+		udelay(2);
+		gpio_direction_output(pdata->spk_ext_pa_gpio, 1);
+#endif
+#endif
+#if !(defined CONFIG_MACH_TENOR_G) && !(defined CONFIG_MACH_TENOR_E)
 		ret =  msm_cdc_pinctrl_select_active_state(
 					pdata->spk_ext_pa_gpio_p);
 		if (ret) {
@@ -420,7 +434,7 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 #ifdef CONFIG_MACH_TENOR_G
 		gpio_set_value_cansleep(pdata->spk_ext_pa1_gpio, enable);
 #endif
-#ifndef CONFIG_MACH_TENOR_G
+#if !(defined CONFIG_MACH_TENOR_G) && !(defined CONFIG_MACH_TENOR_E)
 		ret = msm_cdc_pinctrl_select_sleep_state(
 				pdata->spk_ext_pa_gpio_p);
 		if (ret) {
@@ -1583,7 +1597,7 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 		return NULL;
 
 #define S(X, Y) ((WCD_MBHC_CAL_PLUG_TYPE_PTR(msm8952_wcd_cal)->X) = (Y))
-#ifdef CONFIG_MACH_TENOR_G
+#if (defined CONFIG_MACH_TENOR_G) || (defined CONFIG_MACH_TENOR_E)
 	S(v_hs_max, 1700);
 #else
 	S(v_hs_max, 1500);
