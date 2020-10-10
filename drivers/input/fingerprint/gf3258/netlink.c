@@ -8,8 +8,7 @@
 
 #define NETLINK_TEST 25
 #define MAX_MSGSIZE 16
-int stringlength(char *s);
-void sendnlmsg(char *message);
+
 static int pid = -1;
 struct sock *nl_sk = NULL;
 
@@ -52,7 +51,7 @@ void nl_data_ready(struct sk_buff *__skb)
 	}
 }
 
-int netlink_init(void)
+void netlink_init(void)
 {
 	struct netlink_kernel_cfg netlink_cfg;
 	netlink_cfg.groups = 0;
@@ -62,20 +61,16 @@ int netlink_init(void)
 
 	nl_sk = netlink_kernel_create(&init_net, NETLINK_TEST, &netlink_cfg);
 
-	if (!nl_sk) {
+	if (!nl_sk)
 	pr_err("create netlink socket error\n");
-	return 1;
-	}
-
-	return 0;
 }
 
 void netlink_exit(void)
 {
-	if (nl_sk != NULL) {
-		sock_release(nl_sk->sk_socket);
-	}
+	if (!nl_sk)
+		return;
 
-	pr_info("self module exited\n");
+	netlink_kernel_release(nl_sk);
+	nl_sk = NULL;
 }
 
