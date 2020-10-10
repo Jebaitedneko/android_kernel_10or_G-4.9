@@ -7,13 +7,11 @@
 #include <net/netlink.h>
 
 #define NETLINK_TEST 25
-#define MAX_MSGSIZE 4 * 1024
+#define MAX_MSGSIZE 16
 int stringlength(char *s);
 void sendnlmsg(char *message);
-int pid;
-int err;
+static int pid = -1;
 struct sock *nl_sk = NULL;
-int flag = 0;
 
 void sendnlmsg(char *message)
 {
@@ -22,10 +20,12 @@ void sendnlmsg(char *message)
 	int len = NLMSG_SPACE(MAX_MSGSIZE);
 	int slen = 0;
 	if (!message || !nl_sk)
-		return ;
+		return;
 	skb_1 = alloc_skb(len, GFP_KERNEL);
-	if (!skb_1)
-		printk(KERN_ERR "my_net_link:alloc_skb_1 error\n");
+	if (!skb_1) {
+		pr_err("alloc_skb error\n");
+		return;
+	}
 	slen = strlen(message);
 	nlh = nlmsg_put(skb_1, 0, 0, 0, MAX_MSGSIZE, 0);
 
@@ -42,7 +42,7 @@ void nl_data_ready(struct sk_buff *__skb)
 {
 	struct sk_buff *skb;
 	struct nlmsghdr *nlh;
-	char str[100];
+	char str[16];
 	skb = skb_get (__skb);
 	if (skb->len >= NLMSG_SPACE(0)) {
 		nlh = nlmsg_hdr(skb);
@@ -63,7 +63,7 @@ int netlink_init(void)
 	nl_sk = netlink_kernel_create(&init_net, NETLINK_TEST, &netlink_cfg);
 
 	if (!nl_sk) {
-	printk(KERN_ERR "my_net_link: create netlink socket error.\n");
+	pr_err("create netlink socket error\n");
 	return 1;
 	}
 
@@ -76,6 +76,6 @@ void netlink_exit(void)
 		sock_release(nl_sk->sk_socket);
 	}
 
-	printk("my_net_link: self module exited\n");
+	pr_info("self module exited\n");
 }
 
