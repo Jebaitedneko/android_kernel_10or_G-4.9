@@ -113,8 +113,10 @@ static int try_to_freeze_tasks(bool user_only)
 		}
 		read_unlock(&tasklist_lock);
 	} else {
+		#ifdef CONFIG_DEBUG_FS
 		pr_cont("(elapsed %d.%03d seconds) ", elapsed_msecs / 1000,
 			elapsed_msecs % 1000);
+		#endif
 	}
 
 	return todo ? -EBUSY : 0;
@@ -142,14 +144,17 @@ int freeze_processes(void)
 		atomic_inc(&system_freezing_cnt);
 
 	pm_wakeup_clear();
-	pr_info("Freezing user space processes ... ");
+	pr_debug("Freezing user space processes ... ");
 	pm_freezing = true;
 	error = try_to_freeze_tasks(true);
+	#ifdef CONFIG_DEBUG_FS
 	if (!error) {
 		__usermodehelper_set_disable_depth(UMH_DISABLED);
 		pr_cont("done.");
+
 	}
 	pr_cont("\n");
+	#endif
 	BUG_ON(in_atomic());
 
 	/*
@@ -178,14 +183,16 @@ int freeze_kernel_threads(void)
 {
 	int error;
 
-	pr_info("Freezing remaining freezable tasks ... ");
+	pr_debug("Freezing remaining freezable tasks ... ");
 
 	pm_nosig_freezing = true;
 	error = try_to_freeze_tasks(false);
+	#ifdef CONFIG_DEBUG_FS
 	if (!error)
 		pr_cont("done.");
 
 	pr_cont("\n");
+	#endif
 	BUG_ON(in_atomic());
 
 	if (error)
@@ -206,7 +213,7 @@ void thaw_processes(void)
 
 	oom_killer_enable();
 
-	pr_info("Restarting tasks ... ");
+	pr_debug("Restarting tasks ... ");
 
 	__usermodehelper_set_disable_depth(UMH_FREEZING);
 	thaw_workqueues();
@@ -227,7 +234,9 @@ void thaw_processes(void)
 	usermodehelper_enable();
 
 	schedule();
+	#ifdef CONFIG_DEBUG_FS
 	pr_cont("done.\n");
+	#endif
 	trace_suspend_resume(TPS("thaw_processes"), 0, false);
 }
 
@@ -236,7 +245,7 @@ void thaw_kernel_threads(void)
 	struct task_struct *g, *p;
 
 	pm_nosig_freezing = false;
-	pr_info("Restarting kernel threads ... ");
+	pr_debug("Restarting kernel threads ... ");
 
 	thaw_workqueues();
 
@@ -248,5 +257,7 @@ void thaw_kernel_threads(void)
 	read_unlock(&tasklist_lock);
 
 	schedule();
+	#ifdef CONFIG_DEBUG_FS
 	pr_cont("done.\n");
+	#endif
 }
