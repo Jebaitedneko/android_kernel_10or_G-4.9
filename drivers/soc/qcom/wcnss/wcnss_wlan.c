@@ -3633,8 +3633,10 @@ wcnss_wlan_remove(struct platform_device *pdev)
 static const struct dev_pm_ops wcnss_wlan_pm_ops = {
 	.suspend	= wcnss_wlan_suspend,
 	.resume		= wcnss_wlan_resume,
+	#ifdef CONFIG_DEBUG_FS
 	.suspend_noirq  = wcnss_wlan_suspend_noirq,
 	.resume_noirq   = wcnss_wlan_resume_noirq,
+	#endif
 };
 
 #ifdef CONFIG_WCNSS_CORE_PRONTO
