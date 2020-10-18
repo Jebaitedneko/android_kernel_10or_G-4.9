@@ -16,7 +16,7 @@
 
 #define BOEFFLA_WL_BLOCKER_VERSION	"1.1.0"
 
-#define LIST_WL_DEFAULT				"CHG_PLCY_MAIN_WL;NETLINK;[timerfd];fp_wakelock;event0;event1;eventpoll;KeyEvents"
+#define LIST_WL_DEFAULT				"CHG_PLCY_MAIN_WL;CHG_PLCY_Legacy_WL;NETLINK;[timerfd];fp_wakelock;event0;event1;event2;event3;event4;event5;eventpoll;KeyEvents"
 
 #define LENGTH_LIST_WL				512
 #define LENGTH_LIST_WL_DEFAULT		512
