@@ -5669,9 +5669,7 @@ static struct platform_driver sdhci_msm_driver = {
 		.owner	= THIS_MODULE,
 		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
 		.of_match_table = sdhci_msm_dt_match,
-		#ifndef CONFIG_SUSPEND_SKIP_SYNC
 		.pm	= SDHCI_MSM_PMOPS,
-		#endif
 	},
 };
 
