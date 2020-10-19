@@ -248,11 +248,6 @@ static uint16_t msm_sensor_id_by_mask(struct msm_sensor_ctrl_t *s_ctrl,
 	return sensor_id;
 }
 
-#ifdef CONFIG_MACH_TENOR_G
-static unsigned Main_rgb_camera_gpio_id_pin = (62);
-static unsigned Main_mono_camera_gpio_id_pin = (63);
-#endif
-
 int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int rc = 0;
@@ -261,25 +256,27 @@ int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 	struct msm_camera_slave_info *slave_info;
 	const char *sensor_name;
 
-#ifdef CONFIG_MACH_TENOR_G
+	#ifdef CONFIG_MACH_TENOR_G
+	static unsigned rgb_pin = (62);
+	static unsigned mono_pin = (63);
 	int ret;
-	ret = gpio_request(Main_rgb_camera_gpio_id_pin,"Main_rgb_camera_gpio_id_pin");
+	ret = gpio_request(rgb_pin,"rgb_pin");
 	if (ret < 0) {
-		pr_err("Unable to Main_rgb_camera_gpio_id_pin\n");
-		gpio_free(Main_rgb_camera_gpio_id_pin);
+		gpio_free(rgb_pin);
 	} else {
-		ret = gpio_direction_input(Main_rgb_camera_gpio_id_pin);
-		pr_err("[Mesin]-%s: ret = %d\n", __func__, ret);
+		ret = gpio_direction_input(rgb_pin);
 	}
-	ret = gpio_request(Main_mono_camera_gpio_id_pin,"Main_mono_camera_gpio_id_pin");
+	ret = gpio_request(mono_pin,"mono_pin");
 	if (ret < 0) {
-		pr_err("Unable to Main_mono_camera_gpio_id_pin\n");
-		gpio_free(Main_mono_camera_gpio_id_pin);
+		gpio_free(mono_pin);
 	} else {
-		ret = gpio_direction_input(Main_mono_camera_gpio_id_pin);
-		pr_err("[Mesin]-%s: ret = %d\n", __func__, ret);
+		ret = gpio_direction_input(mono_pin);
 	}
-#endif
+	if ((0==gpio_get_value(rgb_pin))&&(0==gpio_get_value(mono_pin)))
+	{
+		if(0xd855 == chipid){chipid++;}
+	}
+	#endif
 
 	if (!s_ctrl) {
 		pr_err("%s:%d failed: %pK\n",
@@ -326,15 +323,6 @@ int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 		pr_err("%s: %s: read id failed\n", __func__, sensor_name);
 		return rc;
 	}
-
-#ifdef CONFIG_MACH_TENOR_G
-	pr_err("Main_rgb_camera_gpio_id_pin=%d,Main_mono_camera_gpio_id_pin%d",gpio_get_value(Main_rgb_camera_gpio_id_pin),gpio_get_value(Main_mono_camera_gpio_id_pin));
-	pr_err("Mesin_chipid=0x%x,%s\n",chipid,sensor_name);
-	if ((0==gpio_get_value(Main_rgb_camera_gpio_id_pin))&&(0==gpio_get_value(Main_mono_camera_gpio_id_pin)))
-	{
-		if(0xd855 == chipid){chipid++;}
-	}
-#endif
 
 	pr_debug("%s: read id: 0x%x expected id 0x%x:\n",
 			__func__, chipid, slave_info->sensor_id);
