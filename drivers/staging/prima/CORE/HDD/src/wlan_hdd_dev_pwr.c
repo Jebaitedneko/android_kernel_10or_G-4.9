@@ -579,9 +579,12 @@ int hddDevResumeHdlr(struct device *dev)
 
 static const struct dev_pm_ops pm_ops = {
    .suspend = hddDevSuspendHdlr,
+   .resume = hddDevResumeHdlr
+   #ifdef CONFIG_DEBUG_FS
    .resume = hddDevResumeHdlr,
    .suspend_noirq = hddDevSuspendNoIrqHdlr,
    .resume_noirq = hddDevResumeNoIrqHdlr
+   #endif
 };
 
 /*----------------------------------------------------------------------------
