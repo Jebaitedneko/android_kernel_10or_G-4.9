@@ -33,6 +33,8 @@
 
 #include "power.h"
 
+// #define DEBUG_LOG
+
 const char *pm_labels[] = { "mem", "standby", "freeze", NULL };
 const char *pm_states[PM_SUSPEND_MAX];
 
@@ -514,9 +516,13 @@ static int enter_state(suspend_state_t state)
 
 #ifndef CONFIG_SUSPEND_SKIP_SYNC
 	trace_suspend_resume(TPS("sync_filesystems"), 0, true);
+	#ifdef DEBUG_LOG
 	pr_info("PM: Syncing filesystems ... ");
+	#endif
 	sys_sync();
+	#ifdef DEBUG_LOG
 	pr_cont("done.\n");
+	#endif
 	trace_suspend_resume(TPS("sync_filesystems"), 0, false);
 #endif
 
