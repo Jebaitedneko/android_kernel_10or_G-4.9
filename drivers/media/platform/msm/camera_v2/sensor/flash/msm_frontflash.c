@@ -336,7 +336,7 @@ static int32_t msm_frontflash_gpio_init(
 	int32_t i = 0;
 	int32_t rc = 0;
 
-	pr_err("[WENDELL]-%s: Enter\n", __func__);
+	pr_debug("[WENDELL]-%s: Enter\n", __func__);
 	for (i = 0; i < flash_ctrl->flash_num_sources; i++)
 		flash_ctrl->flash_op_current[i] = LED_FULL;
 
@@ -382,7 +382,7 @@ static int32_t msm_frontflash_off(struct msm_flash_ctrl_t *flash_ctrl,
 {
 	int32_t i = 0;
 
-	pr_err("[WENDELL]-%s: Enter\n", __func__);
+	pr_debug("[WENDELL]-%s: Enter\n", __func__);
 
 	for (i = 0; i < flash_ctrl->flash_num_sources; i++)
 		if (flash_ctrl->flash_trigger[i])
@@ -442,7 +442,7 @@ static int32_t msm_frontflash_init(
 	int32_t rc = -EFAULT;
 	enum msm_flash_driver_type flash_driver_type = FLASH_DRIVER_DEFAULT;
 
-	pr_err("[WENDELL]-%s: Enter\n", __func__);
+	pr_debug("[WENDELL]-%s: Enter\n", __func__);
 
 	if (flash_ctrl->flash_state == MSM_CAMERA_FLASH_INIT) {
 		pr_err("%s:%d Invalid flash state = %d",
@@ -511,7 +511,7 @@ static int32_t msm_frontflash_gpio_low(
 {
 	//int rc = -1;
 
-	pr_err("[WENDELL]-%s: -Enter\n", __func__);
+	pr_debug("[WENDELL]-%s: -Enter\n", __func__);
 
     if (gpio_is_valid(front_pinctrl.en_gpio)) {
 		gpio_direction_output(front_pinctrl.en_gpio, 0);
@@ -532,7 +532,7 @@ static int32_t msm_frontflash_gpio_high(
 {
 	//int rc = -1;
 
-	pr_err("[WENDELL]-%s: -Enter\n", __func__);
+	pr_debug("[WENDELL]-%s: -Enter\n", __func__);
 
     if (gpio_is_valid(front_pinctrl.en_gpio)) {
 		gpio_direction_output(front_pinctrl.en_gpio, 1);
@@ -552,7 +552,7 @@ static int32_t msm_frontflash_gpio_off(
 {
 	//int rc = -1;
 
-	pr_err("[WENDELL]-%s: -Enter\n", __func__);
+	pr_debug("[WENDELL]-%s: -Enter\n", __func__);
 
     if (gpio_is_valid(front_pinctrl.en_gpio)) {
 		gpio_direction_output(front_pinctrl.en_gpio, 0);
@@ -570,7 +570,7 @@ static int32_t msm_frontflash_low(
 	uint32_t curr = 0, max_current = 0;
 	int32_t i = 0;
 
-	pr_info("[WENDELL]-%s: Enter\n", __func__);
+	pr_debug("[WENDELL]-%s: Enter\n", __func__);
 	
 		
 	/* Turn off flash triggers */
@@ -655,7 +655,7 @@ static int32_t msm_frontflash_release(
 {
 	int32_t rc = 0;
 	
-	pr_info("[WENDELL]-%s: Enter\n", __func__);
+	pr_debug("[WENDELL]-%s: Enter\n", __func__);
 	if (flash_ctrl->flash_state == MSM_CAMERA_FLASH_RELEASE) {
 		pr_err("%s:%d Invalid flash state = %d",
 			__func__, __LINE__, flash_ctrl->flash_state);
@@ -681,7 +681,7 @@ static int32_t msm_frontflash_config(struct msm_flash_ctrl_t *flash_ctrl,
 
 	mutex_lock(flash_ctrl->flash_mutex);
 
-	pr_err("[WENDELL]: Enter %s type %d\n", __func__, flash_data->cfg_type);
+	pr_debug("[WENDELL]: Enter %s type %d\n", __func__, flash_data->cfg_type);
 
   
 	switch (flash_data->cfg_type) {
@@ -1018,12 +1018,12 @@ static int32_t msm_frontflash_get_dt_data(struct device_node *of_node,
     if (gpio_is_valid(front_pinctrl.en_gpio)) {
         rc = gpio_request(front_pinctrl.en_gpio, "front_flash_en_gpio");
         if (rc) {
-            pr_err("[WENDELL]-%s: reset gpio request failed\n", __func__);
+            pr_debug("[WENDELL]-%s: reset gpio request failed\n", __func__);
         } else {
-    		pr_err("[WENDELL]-%s: front_pinctrl.en_gpio=%d\n", __func__, front_pinctrl.en_gpio);
+    		pr_debug("[WENDELL]-%s: front_pinctrl.en_gpio=%d\n", __func__, front_pinctrl.en_gpio);
         	rc = gpio_direction_output(front_pinctrl.en_gpio, 0);
         	if (rc) {
-             	pr_err("[WENDELL]-%s: set_direction for reset gpio failed\n", __func__);
+             	pr_debug("[WENDELL]-%s: set_direction for reset gpio failed\n", __func__);
         	}
     	}
 	}
@@ -1031,7 +1031,7 @@ static int32_t msm_frontflash_get_dt_data(struct device_node *of_node,
 
 	if (fctrl->flash_driver_type == FLASH_DRIVER_DEFAULT)
 		fctrl->flash_driver_type = FLASH_DRIVER_GPIO;
-	pr_info("[WENDELL]%s:%d fctrl->flash_driver_type = %d", __func__, __LINE__,
+	pr_debug("[WENDELL]%s:%d fctrl->flash_driver_type = %d", __func__, __LINE__,
 		fctrl->flash_driver_type);
 
 	return rc;
