@@ -60,9 +60,9 @@ module_param_named(pr_swap_opt_eff, pr_swap_opt_eff, int, 0644);
 
 /*
  * OOM Killer will be called if the total number of
- * file pages (active+inactive) reaches this limit
+ * file pages (active) reaches this limit
  */
-static int free_file_limit = 340000;
+static int free_file_limit = 36000;
 module_param_named(free_file_limit, free_file_limit, int, 0644);
 
 /* Number of SWAP pages in MiB below which tasks should be killed */
@@ -166,15 +166,14 @@ static int is_low_mem(void)
 	const int lru_base = NR_LRU_BASE - LRU_BASE;
 
 	unsigned long cur_file_mem =
-			global_page_state(lru_base + LRU_ACTIVE_FILE) +
-			global_page_state(lru_base + LRU_INACTIVE_FILE);
+			global_page_state(lru_base + LRU_ACTIVE_FILE);
 
 	unsigned long cur_swap_mem = (get_nr_swap_pages() << (PAGE_SHIFT - 10));
 	unsigned long swap_mem = free_swap_limit * 1024;
 
 	bool lowmem_normal = cur_swap_mem < swap_mem;
 	bool lowmem_critical = lowmem_normal &&
-				cur_file_mem > free_file_limit;
+				cur_file_mem < free_file_limit;
 
 	if (lowmem_critical)
 		return LOWMEM_CRITICAL;
