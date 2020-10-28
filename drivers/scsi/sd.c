@@ -782,7 +782,7 @@ static int sd_setup_discard_cmnd(struct scsi_cmnd *cmd)
 
 	rq->completion_data = page;
 	if (likely(!sdp->timeout_override))
-		rq->timeout = SD_TIMEOUT;
+		rq->timeout = SD_DISCARD_TIMEOUT;
 	else
 		rq->timeout = sdp->timeout_override;
 
@@ -2862,6 +2862,7 @@ static int sd_revalidate_disk(struct gendisk *disk)
 		rw_max = q->limits.io_opt =
 						sdkp->opt_xfer_blocks * sdp->sector_size;
 	} else {
+		q->limits.io_opt = 0;
 		rw_max = min_not_zero(logical_to_sectors(sdp, dev_max),
 				      (sector_t)BLK_DEF_MAX_SECTORS);
 	}

@@ -1835,6 +1835,7 @@ static ssize_t cyttsp5_cmcp_test_store(struct device *dev,
 	 */
 	if (test_item > 0 && test_item < 5)
 		range_check = 0;
+
 	dad->cmcp_test_items = test_item;
 	dad->cmcp_range_check = range_check;
 	dad->cmcp_force_calibrate = force_calibrate;

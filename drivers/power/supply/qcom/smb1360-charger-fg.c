@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, 2018-2020, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013-2015, 2018-2019, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -1412,7 +1412,7 @@ static int smb1360_set_minimum_usb_current(struct smb1360_chip *chip)
 					USB_CTRL_MASK, USB_100_BIT);
 			if (rc)
 				pr_err("Couldn't configure for USB100 rc=%d\n",
-									rc);
+								rc);
 		}
 	} else {
 		pr_debug("USB min current set to 500mA\n");
