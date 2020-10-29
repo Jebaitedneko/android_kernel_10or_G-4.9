@@ -11,6 +11,64 @@
 * GNU General Public License for more details.
 */
 
+/ {
+
+	chosen {
+		bootargs = "quiet core_ctl_disable_cpumask=0-7 kpti=0 noirqdebug";
+	};
+
+	firmware: firmware {
+
+		android {
+
+			fstab {
+
+				vendor {
+
+					dev = "/dev/block/platform/soc/7824900.sdhci/by-name/vendor";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1,discard";
+					fsmgr_flags = "wait";
+					status = "okay";
+				};
+
+				system {
+
+					compatible = "android,system";
+					dev = "/dev/block/platform/soc/7824900.sdhci/by-name/system";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1,discard";
+					fsmgr_flags = "wait";
+					status = "okay";
+				};
+			};
+		};
+	};
+
+	reserved_memory: reserved-memory {
+
+		ramoops@9ff00000 {
+			compatible = "ramoops";
+			reg = <0x0 0x9ff00000 0x0 0x300000>;
+		};
+	};
+
+	qrd_batterydata: qcom,battery-data {
+		#include "batterydata_Amazon_4V4_4000mAh.dtsi"
+	};
+};
+
+&other_ext_mem {
+	reg = <0x0 0x84A00000 0x0 0x1E00000>;
+};
+
+&modem_mem {
+
+	no-map;
+
+	/delete-property/ no-map-fixup;
+};
+
 &soc {
 
 	i2c@78b7000 { /* BLSP1 QUP3 */
@@ -86,25 +144,21 @@
 			pinctrl-7 = <&ts_rst_input>;
 			reset-gpios = <&tlmm 64 0x00>;
 			irq-gpios = <&tlmm 65 0x2008>;
-			irq-flags = <2>;
-			touchscreen-max-id = <10>;
+			irq-flags = <1>;
+			touchscreen-max-id = <5>;
 			touchscreen-size-x = <1080>;
 			touchscreen-size-y = <1920>;
-			touchscreen-max-w = <1024>;
+			touchscreen-max-w = <1080>;
 			touchscreen-max-p = <1024>;
-			touchscreen-key-map = <139 172 158>;
-			goodix,type-a-report = <0>;
+			goodix,type-a-report = <1>;
 			goodix,driver-send-cfg = <1>;
-			goodix,wakeup-with-reset = <0>;
 			goodix,resume-in-workqueue = <1>;
 			goodix,int-sync = <1>;
 			goodix,swap-x2y = <0>;
 			goodix,esd-protect = <1>;
-			goodix,pen-suppress-finger = <0>;
 			goodix,auto-update = <0>;
 			goodix,auto-update-cfg = <0>;
 			goodix,power-off-sleep = <0>;
-			goodix,slide-wakeup = <1>;
 			goodix,cfg-group0 = [
                         45 38 04 80 07 0A 3C 80 02 C8 28 
                         05 50 37 03 05 00 00 00 00 11 11 

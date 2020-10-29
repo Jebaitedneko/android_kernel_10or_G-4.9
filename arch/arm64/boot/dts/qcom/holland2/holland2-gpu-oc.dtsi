@@ -11,38 +11,115 @@
 * GNU General Public License for more details.
 */
 
+&gpubw {
+
+	qcom,bw-tbl =
+		< 0    >, /*     off                              */
+		< 1611 >, /*  1. DDR:211.20  MHz BIMC: 105.60 MHz */
+		< 2124 >, /*  2. DDR:278.40  MHz BIMC: 139.20 MHz */
+		< 2929 >, /*  3. DDR:384.00  MHz BIMC: 192.00 MHz */
+		< 3222 >, /*  4. DDR:422.40  MHz BIMC: 211.20 MHz */
+		< 4248 >, /*  5. DDR:556.80  MHz BIMC: 278.40 MHz */
+		< 5126 >, /*  6. DDR:672.00  MHz BIMC: 336.00 MHz */
+		< 5859 >, /*  7. DDR:768.00  MHz BIMC: 384.00 MHz */
+		< 6152 >, /*  8. DDR:806.40  MHz BIMC: 403.20 MHz */
+		< 6445 >, /*  9. DDR:844.80  MHz BIMC: 422.40 MHz */
+		< 7104 >, /* 10. DDR:931.20  MHz BIMC: 465.60 MHz */
+		< 7759 >, /* 11. DDR:1017.00 MHz BIMC: 508.50 MHz */
+		< 9887 >; /* 12. DDR:1296.00 MHz BIMC: 648.00 MHz */
+};
+
 &msm_gpu {
+
+	qcom,bus-width = <24>;
+	qcom,msm-bus,num-cases = <13>;
+	qcom,msm-bus,vectors-KBps =
+		<26 512 0 0>,	     /*     off         */
+		<26 512 0 1689600>,  /*  1. 211.20  MHz */
+		<26 512 0 2227200>,  /*  2. 278.40  MHz */
+		<26 512 0 3072000>,  /*  3. 384.00  MHz */
+		<26 512 0 3379200>,  /*  4. 422.40  MHz */
+		<26 512 0 4454400>,  /*  5. 556.80  MHz */
+		<26 512 0 5376000>,  /*  6. 672.00  MHz */
+		<26 512 0 6144000>,  /*  7. 768.00  MHz */
+		<26 512 0 6451200>,  /*  8. 806.40  MHz */
+		<26 512 0 6758400>,  /*  9. 844.80  MHz */
+		<26 512 0 7449600>,  /* 10. 931.20  MHz */
+		<26 512 0 8136000>,  /* 11. 1017.00 MHz */
+		<26 512 0 10368000>; /* 12. 1296.00 MHz */
+
+	/* Redefined Timeouts */
+	qcom,idle-timeout = <64>; //msecs
+	qcom,deep-nap-timeout = <64>; //msecs
+
+	/* CPU latency parameter */
+	qcom,pm-qos-active-latency = <300>;
+	qcom,pm-qos-wakeup-latency = <300>;
+
+	/* Don't wake GPU on touch */
+	qcom,disable-wake-on-touch;
+
+	/* Don't disable Local Memory */
+	/delete-property/ qcom,gpu-quirk-lmloadkill-disable;
 
 	/* Idle Frequency */
 	qcom,initial-pwrlevel = <8>;
 
-	/* Enable cooling cell support */
-	#cooling-cells = <2>;
-
 	/* Context aware jump target power level */
 	qcom,ca-target-pwrlevel = <6>;
+
+	/* Disable Coresight */
+	/delete-node/ qcom,gpu-coresights;
+
+
+	/* GPU Mempools */
+	qcom,gpu-mempools {
+
+		/delete-property/ qcom,mempool-max-pages;
+
+		/* 4M Page Pool configuration */
+		qcom,gpu-mempool@0 {
+			reg = <0>;
+			qcom,mempool-page-size = <4194304>;
+		};
+		/* 4M Page Pool configuration */
+		qcom,gpu-mempool@1 {
+			reg = <1>;
+			qcom,mempool-page-size = <4194304>;
+		};
+		/* 4M Page Pool configuration */
+		qcom,gpu-mempool@2 {
+			reg = <2>;
+			qcom,mempool-page-size = <4194304>;
+		};
+		/* 4M Page Pool configuration */
+		qcom,gpu-mempool@3 {
+			reg = <3>;
+			qcom,mempool-page-size = <4194304>;
+		};
+	};
 
 	/* Power levels */
 	qcom,gpu-pwrlevels {
 
-		/* Turbo 1.55 */
+		/* Turbo 1.625 */
 		qcom,gpu-pwrlevel@0 {
 
 			reg = <0>;
-			qcom,gpu-freq = <1550000000>;
-			qcom,bus-freq = <10>;
-			qcom,bus-min = <10>;
-			qcom,bus-max = <10>;
+			qcom,gpu-freq = <1625000000>;
+			qcom,bus-freq = <12>;
+			qcom,bus-min = <12>;
+			qcom,bus-max = <12>;
 		};
 
-		/* Turbo 1.35 */
+		/* Turbo 1.352 */
 		qcom,gpu-pwrlevel@1 {
 
 			reg = <1>;
-			qcom,gpu-freq = <1350000000>;
-			qcom,bus-freq = <10>;
-			qcom,bus-min = <10>;
-			qcom,bus-max = <10>;
+			qcom,gpu-freq = <1352000000>;
+			qcom,bus-freq = <12>;
+			qcom,bus-min = <6>;
+			qcom,bus-max = <12>;
 		};
 
 		/* TURBO */
@@ -50,9 +127,9 @@
 
 			reg = <2>;
 			qcom,gpu-freq = <650000000>;
-			qcom,bus-freq = <10>;
-			qcom,bus-min = <10>;
-			qcom,bus-max = <10>;
+			qcom,bus-freq = <11>;
+			qcom,bus-min = <5>;
+			qcom,bus-max = <11>;
 		};
 
 		/* NOM+ */
@@ -60,9 +137,9 @@
 
 			reg = <3>;
 			qcom,gpu-freq = <560000000>;
-			qcom,bus-freq = <10>;
-			qcom,bus-min = <8>;
-			qcom,bus-max = <10>;
+			qcom,bus-freq = <9>;
+			qcom,bus-min = <4>;
+			qcom,bus-max = <9>;
 		};
 
 		/* NOM */
@@ -70,9 +147,9 @@
 
 			reg = <4>;
 			qcom,gpu-freq = <510000000>;
-			qcom,bus-freq = <9>;
-			qcom,bus-min = <6>;
-			qcom,bus-max = <10>;
+			qcom,bus-freq = <8>;
+			qcom,bus-min = <4>;
+			qcom,bus-max = <8>;
 		};
 
 		/* SVS+ */
@@ -81,8 +158,8 @@
 			reg = <5>;
 			qcom,gpu-freq = <400000000>;
 			qcom,bus-freq = <7>;
-			qcom,bus-min = <5>;
-			qcom,bus-max = <8>;
+			qcom,bus-min = <3>;
+			qcom,bus-max = <7>;
 		};
 
 		/* SVS */
@@ -90,9 +167,9 @@
 
 			reg = <6>;
 			qcom,gpu-freq = <320000000>;
-			qcom,bus-freq = <4>;
+			qcom,bus-freq = <5>;
 			qcom,bus-min = <2>;
-			qcom,bus-max = <6>;
+			qcom,bus-max = <5>;
 		};
 
 	       /* Low SVS */
@@ -100,9 +177,9 @@
 
 			reg = <7>;
 			qcom,gpu-freq = <216000000>;
-			qcom,bus-freq = <1>;
+			qcom,bus-freq = <2>;
 			qcom,bus-min = <1>;
-			qcom,bus-max = <4>;
+			qcom,bus-max = <2>;
 		};
 
 	       /* Min SVS */
@@ -110,9 +187,9 @@
 
 			reg = <8>;
 			qcom,gpu-freq = <133300000>;
-			qcom,bus-freq = <1>;
+			qcom,bus-freq = <2>;
 			qcom,bus-min = <1>;
-			qcom,bus-max = <4>;
+			qcom,bus-max = <2>;
 		};
 
 		/* XO */
@@ -140,17 +217,65 @@
 		< 510000000   5 >,  /* NOM        */
 		< 560000000   6 >,  /* Nom Plus   */
 		< 650000000   7 >,  /* Turbo      */
-		< 1350000000  8 >,  /* Turbo 1.35 */
-		< 1550000000  9 >;  /* Turbo 1.55 */
+		< 1352000000  8 >,  /* Turbo 1.352 */
+		< 1625000000  9 >;  /* Turbo 1.625 */
+};
+
+&rpm_bus {
+
+	/* PM8953 S2 - VDD_CX supply */
+	rpm-regulator-smpa2 {
+		pm8953_s2_level: regulator-s2-level {
+			regulator-min-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-level;
+		};
+
+		pm8953_s2_floor_level: regulator-s2-floor-level {
+			regulator-min-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-floor-level;
+			qcom,always-send-voltage;
+		};
+
+		pm8953_s2_level_ao: regulator-s2-level-ao {
+			regulator-min-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-level;
+		};
+
+		cx_cdev: regulator-cx-cdev {
+			regulator-cdev-supply = <&pm8953_s2_floor_level>;
+			regulator-levels = <RPM_SMD_REGULATOR_LEVEL_NOM
+					RPM_SMD_REGULATOR_LEVEL_RETENTION>;
+			#cooling-cells = <2>;
+		};
+	};
+};
+
+&gfx_mem_acc {
+	regulator-min-microvolt = <1>;
+	regulator-max-microvolt = <4>;
+	qcom,corner-acc-map = <0x3 0x2 0x1 0x0>;
 };
 
 &gfx_vreg_corner {
 
-	regulator-max-microvolt = <9>; /* Base (7) + Turbo 1.35 (1) + Turbo 1.55 (1) = 9 */
+	regulator-max-microvolt = <9>; /* Base (7) + Turbo 1.352 (1) + Turbo 1.625 (1) = 9 */
 
-	qcom,num-corners = <9>; /* Base (7) + Turbo 1.35 (1) + Turbo 1.55 (1) = 9 */
+	qcom,num-corners = <9>; /* Base (7) + Turbo 1.352 (1) + Turbo 1.625 (1) = 9 */
 
-	qcom,ldo-enable-corner-map = <1 1 1 0 0 0 0 0 0>; /* Defaults  Turbo 1.35  Turbo 1.55 */
+	qcom,num-ldo-corners = <3>;
+	qcom,ldo-enable-corner-map = <1 1 1 0 0 0 0 0 0>; /* Defaults  Turbo 1.352  Turbo 1.625 */
+	qcom,ldo-voltage-ceiling = <620000 680000 750000>;
+	qcom,ldo-voltage-floor =   <510000 510000 600000>;
+	qcom,ldo-init-voltage-adjustment = <35000 25000 0>;
 
 	qcom,vdd-cx-corner-map = <RPM_SMD_REGULATOR_LEVEL_LOW_SVS>,
 				<RPM_SMD_REGULATOR_LEVEL_LOW_SVS>,
@@ -159,8 +284,8 @@
 				<RPM_SMD_REGULATOR_LEVEL_NOM>,
 				<RPM_SMD_REGULATOR_LEVEL_NOM_PLUS>,
 				<RPM_SMD_REGULATOR_LEVEL_TURBO>,
-				<RPM_SMD_REGULATOR_LEVEL_TURBO>, /* Turbo 1.35 */
-				<RPM_SMD_REGULATOR_LEVEL_TURBO>; /* Turbo 1.55 */
+				<RPM_SMD_REGULATOR_LEVEL_TURBO>, /* Turbo 1.352 */
+				<RPM_SMD_REGULATOR_LEVEL_TURBO>; /* Turbo 1.625 */
 
-	qcom,mem-acc-corner-map = <1 1 1 2 2 2 2 2 2>; /* Defaults  Turbo 1.35  Turbo 1.55 */
+	qcom,mem-acc-corner-map = <1 1 1 2 2 2 2 4 4>; /* Defaults  Turbo 1.352  Turbo 1.625 */
 };

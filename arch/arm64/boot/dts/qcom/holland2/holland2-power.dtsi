@@ -60,6 +60,8 @@
 				qcom,decimation = <1>;
 				qcom,fast-avg-setup = <5>;
 			};
+
+			/delete-node/ chan@11;
 		};
 
 		pm8953_adc_tm: vadc@3400 {
@@ -68,12 +70,18 @@
 				qcom,decimation = <1>;
 				qcom,fast-avg-setup = <5>;
 			};
+
+			/delete-node/ chan@11;
 		};
 
 		/delete-node/ qcom,pm8953_typec@bf00;
 	};
 
 	qcom,pmi8950@2 {
+
+		pmi8950_vadc: vadc@3100 {
+			status = "disabled";
+		};
 
 		pmi8950_gpios: gpios {
 
@@ -96,6 +104,8 @@
 			qcom,skip-usb-suspend-for-fake-battery;
 			qcom,thermal-mitigation = <2100 1800 1500 1200 900 600 300 0>;
 			qcom,float-voltage-mv-ntc = <4100>;
+			qcom,chg-led-sw-controls;
+			qcom,chg-led-support;
 
 			/delete-property/ qcom,external-typec;
 			/delete-property/ qcom,fastchg-current-comp;
@@ -141,25 +151,31 @@
 	};
 };
 
-&rpm_bus {
-
-	rpm-regulator-ldoa1 {
-		pm8953_l1: regulator-l1 {
-			regulator-max-microvolt = <1100000>;
+&thermal_zones {
+	case-therm-step {
+		trips {
+			modem_trip0: modem-trip0 {
+				temperature = <70000>;
+			};
+			modem_trip1: modem-trip1 {
+				temperature = <72000>;
+			};
+			modem_trip2: modem-trip2 {
+				temperature = <75000>;
+				type = "critical";
+			};
 		};
 	};
 
-	rpm-regulator-ldoa17 {
-
-		pm8953_l17: regulator-l17 {
-			regulator-min-microvolt = <2850000>;
-			regulator-max-microvolt = <2850000>;
-		};
+	xo-therm-adc {
+		polling-delay = <1000>;
 	};
-	
-	rpm-regulator-ldoa22 {
-		pm8953_l22: regulator-l22 {
-			regulator-max-microvolt = <2850000>;
-		};
+
+	chg-temp-adc {
+		status = "disabled";
+	};
+
+	pa-therm1-adc {
+		status = "disabled";
 	};
 };

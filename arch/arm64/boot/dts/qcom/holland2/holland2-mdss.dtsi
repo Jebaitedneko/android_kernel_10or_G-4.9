@@ -11,10 +11,14 @@
 * GNU General Public License for more details.
 */
 
-&mdss_dsi1 {
+/delete-node/ &mdss_dsi1;
 
-	lab-supply = <&lab_regulator>;
-	ibb-supply = <&ibb_regulator>;
+&lab_regulator {
+	qcom,qpnp-lab-init-lcd-voltage = <5300000>;
+};
+
+&ibb_regulator {
+	qcom,qpnp-ibb-init-lcd-voltage = <5300000>;
 };
 
 &dsi_panel_pwr_supply {
@@ -43,6 +47,8 @@
 
 &mdss_mdp {
 
+	qcom,mdss-traffic-shaper-enabled;
+	qcom,mdss-has-fixed-qos-arbiter-enabled;
 	qcom,mdss-rot-downscale-min = <0x2>;
 	qcom,mdss-rot-downscale-max = <0x10>;
 };
