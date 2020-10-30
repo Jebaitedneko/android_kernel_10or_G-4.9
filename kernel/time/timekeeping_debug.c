@@ -25,6 +25,8 @@
 
 #define NUM_BINS 32
 
+// #define DEBUG_LOG
+
 static unsigned int sleep_time_bin[NUM_BINS] = {0};
 
 static int tk_debug_show_sleep_time(struct seq_file *s, void *data)
@@ -75,7 +77,9 @@ void tk_debug_account_sleep_time(struct timespec64 *t)
 	int bin = min(fls(t->tv_sec), NUM_BINS-1);
 
 	sleep_time_bin[bin]++;
+	#ifdef DEBUG_LOG
 	printk_deferred(KERN_INFO "Suspended for %lld.%03lu seconds\n",
 			(s64)t->tv_sec, t->tv_nsec / NSEC_PER_MSEC);
+	#endif
 }
 
