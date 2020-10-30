@@ -319,32 +319,27 @@ static int gf_probe(struct platform_device *pdev)
 		if (gf_dev->input == NULL) {
 			pr_err("%s, failed to allocate input device\n", __func__);
 			status = -ENOMEM;
-			goto error_dev;
+			if (gf_dev->input != NULL)
+				input_free_device(gf_dev->input);
 		}
 
 		gf_dev->input->name = GF_INPUT_NAME;
 		status = input_register_device(gf_dev->input);
 		if (status) {
 			pr_err("failed to register input device\n");
-			goto error_input;
+			if (gf_dev->devt != 0) {
+				pr_info("Err: status = %d\n", status);
+				mutex_lock(&device_list_lock);
+				list_del(&gf_dev->device_entry);
+				device_destroy(gf_class, gf_dev->devt);
+				clear_bit(MINOR(gf_dev->devt), minors);
+				mutex_unlock(&device_list_lock);
+			}
 		}
 
 	wakeup_source_init(&fp_wakelock, "fp_wakelock");
 
 	return status;
-
-error_input:
-	if (gf_dev->input != NULL)
-		input_free_device(gf_dev->input);
-error_dev:
-	if (gf_dev->devt != 0) {
-		pr_info("Err: status = %d\n", status);
-		mutex_lock(&device_list_lock);
-		list_del(&gf_dev->device_entry);
-		device_destroy(gf_class, gf_dev->devt);
-		clear_bit(MINOR(gf_dev->devt), minors);
-		mutex_unlock(&device_list_lock);
-	}
 }
 
 static int gf_remove(struct platform_device *pdev)
