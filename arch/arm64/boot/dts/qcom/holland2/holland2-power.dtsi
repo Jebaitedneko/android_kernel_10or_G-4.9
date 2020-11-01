@@ -142,26 +142,3 @@
 		};
 	};
 };
-
-&rpm_bus {
-
-	rpm-regulator-ldoa1 {
-		pm8953_l1: regulator-l1 {
-			regulator-max-microvolt = <1100000>;
-		};
-	};
-
-	rpm-regulator-ldoa17 {
-
-		pm8953_l17: regulator-l17 {
-			regulator-min-microvolt = <2850000>;
-			regulator-max-microvolt = <2850000>;
-		};
-	};
-	
-	rpm-regulator-ldoa22 {
-		pm8953_l22: regulator-l22 {
-			regulator-max-microvolt = <2850000>;
-		};
-	};
-};
