@@ -13,6 +13,10 @@
 
 &msm_gpu {
 
+	/* Redefined Timeouts */
+	qcom,idle-timeout = <25>; //msecs
+	qcom,deep-nap-timeout = <25>; //msecs
+
 	/* Idle Frequency */
 	qcom,initial-pwrlevel = <8>;
 
