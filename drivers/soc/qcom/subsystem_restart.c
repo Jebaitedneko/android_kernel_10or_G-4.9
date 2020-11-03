@@ -294,7 +294,7 @@ static ssize_t firmware_name_store(struct device *dev,
 	if (p)
 		count = p - buf;
 
-	pr_info("Changing subsys fw_name to %s\n", buf);
+	pr_debug("Changing subsys fw_name to %s\n", buf);
 	mutex_lock(&track->lock);
 	strlcpy(subsys->desc->fw_name, buf,
 			min(count + 1, sizeof(subsys->desc->fw_name)));
@@ -951,7 +951,7 @@ void *__subsystem_get(const char *name, const char *fw_name)
 	mutex_lock(&track->lock);
 	if (!subsys->count) {
 		if (fw_name) {
-			pr_info("Changing subsys fw_name to %s\n", fw_name);
+			pr_debug("Changing subsys fw_name to %s\n", fw_name);
 			strlcpy(subsys->desc->fw_name, fw_name,
 				sizeof(subsys->desc->fw_name));
 		}
