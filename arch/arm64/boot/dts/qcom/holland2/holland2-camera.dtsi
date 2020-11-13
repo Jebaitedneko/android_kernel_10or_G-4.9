@@ -22,6 +22,10 @@
 		qcom,torch-source = <&pmi8950_torch0 &pmi8950_torch1>;
 		qcom,switch-source = <&pmi8950_switch>;
 	};
+
+	qcom,vidc@1d00000 {
+		qcom,max-hw-load = <2563200>; /* Full 4k @ 60 + 1080p @ 60 */
+	};
 };
 
 &flash_led {
