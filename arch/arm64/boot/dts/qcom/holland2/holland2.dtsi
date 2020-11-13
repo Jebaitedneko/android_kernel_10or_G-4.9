@@ -14,6 +14,7 @@
 #include "holland2-audio.dtsi"
 #include "holland2-camera.dtsi"
 #include "holland2-general.dtsi"
+#include "holland2-cpu-oc.dtsi"
 #include "holland2-gpu-oc.dtsi"
 #include "holland2-mdss.dtsi"
 #include "holland2-power.dtsi"
