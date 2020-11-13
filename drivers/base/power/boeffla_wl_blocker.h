@@ -16,7 +16,7 @@
 
 #define BOEFFLA_WL_BLOCKER_VERSION	"1.1.0"
 
-#define LIST_WL_DEFAULT				"ApmAudio;ApmOutput;IPA_WS;IPA_RM12;bms;CHG_PLCY_MAIN_WL;CHG_PLCY_Legacy_WL;NETLINK;[timerfd];fp_wakelock;event0;event1;event2;event3;event4;event5;eventpoll;KeyEvents;video0;video1;video2;video3;video32;video33"
+#define LIST_WL_DEFAULT				"ApmAudio;ApmOutput;IPA_WS;IPA_RM12;bms;battery;usb;CHG_PLCY_MAIN_WL;CHG_PLCY_Legacy_WL;NETLINK;[timerfd];fp_wakelock;event0;event1;event2;event3;event4;event5;eventpoll;KeyEvents;video0;video1;video2;video3;video32;video33"
 
 #define LENGTH_LIST_WL				512
 #define LENGTH_LIST_WL_DEFAULT		512
