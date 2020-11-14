@@ -49,8 +49,18 @@
 		<26 512 0 10368000>; /* 12. 1296.00 MHz */
 
 	/* Redefined Timeouts */
-	qcom,idle-timeout = <25>; //msecs
-	qcom,deep-nap-timeout = <25>; //msecs
+	qcom,idle-timeout = <10>; //msecs
+	qcom,deep-nap-timeout = <10>; //msecs
+
+	/* CPU latency parameter */
+	qcom,pm-qos-active-latency = <300>;
+	qcom,pm-qos-wakeup-latency = <300>;
+
+	/* Don't wake GPU on touch */
+	qcom,disable-wake-on-touch;
+
+	/* Don't disable Local Memory */
+	/delete-property/ qcom,gpu-quirk-lmloadkill-disable;
 
 	/* Idle Frequency */
 	qcom,initial-pwrlevel = <7>;
