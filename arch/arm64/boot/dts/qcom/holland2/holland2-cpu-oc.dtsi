@@ -161,6 +161,12 @@
 		<  883200000 9>;
 };
 
+&apc_cpr {
+
+	/* Turbo (corner 6) ceiling voltage */
+	qcom,cpr-aging-ref-voltage = <900000>;
+};
+
 &apc_vreg {
 
 	qcom,cpr-speed-bin-corners =
@@ -210,20 +216,20 @@
 
 	qcom,cpr-voltage-ceiling =
 		/* Speed bin 0 */
-		<600000  700000 800000 850000 900000
-			900000 900000 950000 1000000>,
+		<600000  700000 750000 800000 850000
+			875000 875000 900000 900000>,
 
 		/* Speed bin 2 */
-		<600000  700000 800000 850000 900000
-			900000 900000>,
+		<600000  700000 750000 800000 850000
+			875000 875000>,
 
 		/* Speed bin 6 */
-		<600000  700000 800000 850000 900000
-			900000 900000>,
+		<600000  700000 750000 800000 850000
+			875000 875000>,
 
 		/* Speed bin 7 */
-		<600000  700000 800000 850000 900000
-			900000 900000 950000 1000000>;
+		<600000  700000 750000 800000 850000
+			875000 875000 900000 900000>;
 
 	qcom,cpr-voltage-floor =
 		/* Speed bin 0 */
@@ -381,11 +387,11 @@
 		/* PM8953 S5 + S6 = VDD_APC supply */
 		pm8953_s5: spm-regulator@2000 {
 			regulator-min-microvolt = <350000>; /* Default 400000 */
-			regulator-max-microvolt = <1100000>; /* Default 1140000 */
+			regulator-max-microvolt = <900000>; /* Default 1140000 */
 
 			pm8953_s5_limit: avs-limit-regulator {
 				regulator-min-microvolt = <350000>; /* Default 400000 */
-				regulator-max-microvolt = <1100000>; /* Default 1140000 */
+				regulator-max-microvolt = <900000>; /* Default 1140000 */
 			};
 		};
 	};
