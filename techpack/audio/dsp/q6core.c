@@ -487,7 +487,7 @@ static int q6core_send_get_avcs_fwk_ver_cmd(void)
 	avcs_ver_cmd.token = 0;
 	avcs_ver_cmd.opcode = AVCS_CMD_GET_FWK_VERSION;
 
-	q6core_lcl.adsp_status = 0;
+	q6core_lcl.adsp_status = 1;
 	q6core_lcl.avcs_fwk_ver_resp_received = 0;
 
 	ret = apr_send_pkt(q6core_lcl.core_handle_q,

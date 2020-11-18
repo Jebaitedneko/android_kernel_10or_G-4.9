@@ -2985,15 +2985,9 @@ int afe_tdm_port_start(u16 port_id, struct afe_tdm_port_config *tdm_port,
 		ret = -EINVAL;
 		goto fail_cmd;
 	}
-
-	if (q6core_get_avcs_api_version_per_service(
-		APRV2_IDS_SERVICE_ID_ADSP_AFE_V) >= AFE_API_VERSION_V3)
-		ret = afe_send_slot_mapping_cfg_v2(
-				&tdm_port->slot_mapping_v2, port_id);
-	else
-		ret = afe_send_slot_mapping_cfg(
-				&tdm_port->slot_mapping,
-				port_id);
+	ret = afe_send_slot_mapping_cfg(
+			&tdm_port->slot_mapping,
+			port_id);
 
 	if (ret < 0) {
 		pr_err("%s: afe send failed %d\n", __func__, ret);
