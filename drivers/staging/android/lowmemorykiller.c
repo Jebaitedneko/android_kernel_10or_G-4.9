@@ -104,6 +104,10 @@ static struct kobject *lowmem_notify_kobj;
 			pr_info(x);			\
 	} while (0)
 
+#ifndef CONFIG_DEBUG_FS
+#define lowmem_print(level, x...) {}
+#endif
+
 
 static DECLARE_WAIT_QUEUE_HEAD(event_wait);
 static DEFINE_SPINLOCK(lmk_event_lock);
