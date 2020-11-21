@@ -83,6 +83,11 @@ ifeq ($(CONFIG_COMPAT_VDSO), y)
   endif
 endif
 
+ifeq ($(CONFIG_ARCH_MSM8953), y)
+KBUILD_CFLAGS += -march=armv8-a+crypto+crc -mtune=cortex-a53 -mcpu=cortex-a53+crypto+crc
+KBUILD_AFLAGS += -march=armv8-a+crypto+crc -mtune=cortex-a53 -mcpu=cortex-a53+crypto+crc
+endif
+
 ifeq ($(cc-name),clang)
 # This is a workaround for https://bugs.llvm.org/show_bug.cgi?id=30792.
 # TODO: revert when this is fixed in LLVM.
