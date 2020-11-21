@@ -1451,7 +1451,7 @@ static void ispif_process_irq(struct ispif_device *ispif,
 	if (out[vfe_id].ispifIrqStatus0 &
 			ISPIF_IRQ_STATUS_PIX_SOF_MASK) {
 		if (ispif->ispif_sof_debug < ISPIF_SOF_DEBUG_COUNT)
-			pr_debug("%s: PIX0 frame id: %u\n", __func__,
+			pr_err("%s: PIX0 frame id: %u\n", __func__,
 				ispif->sof_count[vfe_id].sof_cnt[PIX0]);
 		ispif->sof_count[vfe_id].sof_cnt[PIX0]++;
 		ispif->ispif_sof_debug++;
@@ -1459,7 +1459,7 @@ static void ispif_process_irq(struct ispif_device *ispif,
 	if (out[vfe_id].ispifIrqStatus1 &
 			ISPIF_IRQ_STATUS_PIX_SOF_MASK) {
 		if (ispif->ispif_sof_debug < ISPIF_SOF_DEBUG_COUNT*2)
-			pr_debug("%s: PIX1 frame id: %u\n", __func__,
+			pr_err("%s: PIX1 frame id: %u\n", __func__,
 				ispif->sof_count[vfe_id].sof_cnt[PIX1]);
 		ispif->sof_count[vfe_id].sof_cnt[PIX1]++;
 		ispif->ispif_sof_debug++;
@@ -1467,7 +1467,7 @@ static void ispif_process_irq(struct ispif_device *ispif,
 	if (out[vfe_id].ispifIrqStatus0 &
 			ISPIF_IRQ_STATUS_RDI0_SOF_MASK) {
 		if (ispif->ispif_rdi0_debug < ISPIF_SOF_DEBUG_COUNT)
-			pr_debug("%s: RDI0 frame id: %u\n", __func__,
+			pr_err("%s: RDI0 frame id: %u\n", __func__,
 				ispif->sof_count[vfe_id].sof_cnt[RDI0]);
 		ispif->sof_count[vfe_id].sof_cnt[RDI0]++;
 		ispif->ispif_rdi0_debug++;
@@ -1475,7 +1475,7 @@ static void ispif_process_irq(struct ispif_device *ispif,
 	if (out[vfe_id].ispifIrqStatus1 &
 			ISPIF_IRQ_STATUS_RDI1_SOF_MASK) {
 		if (ispif->ispif_rdi1_debug < ISPIF_SOF_DEBUG_COUNT)
-			pr_debug("%s: RDI1 frame id: %u\n", __func__,
+			pr_err("%s: RDI1 frame id: %u\n", __func__,
 				ispif->sof_count[vfe_id].sof_cnt[RDI1]);
 		ispif->sof_count[vfe_id].sof_cnt[RDI1]++;
 		ispif->ispif_rdi1_debug++;
@@ -1483,7 +1483,7 @@ static void ispif_process_irq(struct ispif_device *ispif,
 	if (out[vfe_id].ispifIrqStatus2 &
 			ISPIF_IRQ_STATUS_RDI2_SOF_MASK) {
 		if (ispif->ispif_rdi2_debug < ISPIF_SOF_DEBUG_COUNT)
-			pr_debug("%s: RDI2 frame id: %u\n", __func__,
+			pr_err("%s: RDI2 frame id: %u\n", __func__,
 				ispif->sof_count[vfe_id].sof_cnt[RDI2]);
 		ispif->sof_count[vfe_id].sof_cnt[RDI2]++;
 		ispif->ispif_rdi2_debug++;

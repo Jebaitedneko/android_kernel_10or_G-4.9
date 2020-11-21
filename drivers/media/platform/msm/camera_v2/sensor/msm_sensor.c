@@ -18,9 +18,6 @@
 #include <linux/regulator/rpm-smd-regulator.h>
 #include <linux/regulator/consumer.h>
 #include <media/adsp-shmem-device.h>
-#ifdef CONFIG_MACH_TENOR_G
-#include <linux/of_gpio.h>
-#endif
 
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
@@ -255,28 +252,6 @@ int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 	struct msm_camera_i2c_client *sensor_i2c_client;
 	struct msm_camera_slave_info *slave_info;
 	const char *sensor_name;
-
-	#ifdef CONFIG_MACH_TENOR_G
-	static unsigned rgb_pin = (62);
-	static unsigned mono_pin = (63);
-	int ret;
-	ret = gpio_request(rgb_pin,"rgb_pin");
-	if (ret < 0) {
-		gpio_free(rgb_pin);
-	} else {
-		ret = gpio_direction_input(rgb_pin);
-	}
-	ret = gpio_request(mono_pin,"mono_pin");
-	if (ret < 0) {
-		gpio_free(mono_pin);
-	} else {
-		ret = gpio_direction_input(mono_pin);
-	}
-	if ((0==gpio_get_value(rgb_pin))&&(0==gpio_get_value(mono_pin)))
-	{
-		if(0xd855 == chipid){chipid++;}
-	}
-	#endif
 
 	if (!s_ctrl) {
 		pr_err("%s:%d failed: %pK\n",
