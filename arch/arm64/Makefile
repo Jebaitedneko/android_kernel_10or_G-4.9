@@ -86,6 +86,11 @@ endif
 ifeq ($(CONFIG_ARCH_MSM8953), y)
 KBUILD_CFLAGS += -march=armv8-a+crypto+crc -mtune=cortex-a53 -mcpu=cortex-a53+crypto+crc
 KBUILD_AFLAGS += -march=armv8-a+crypto+crc -mtune=cortex-a53 -mcpu=cortex-a53+crypto+crc
+else
+ifeq ($(CONFIG_ARCH_MSM8937), y)
+KBUILD_CFLAGS += -march=armv8-a+crypto+crc -mtune=cortex-a53 -mcpu=cortex-a53+crypto+crc
+KBUILD_AFLAGS += -march=armv8-a+crypto+crc -mtune=cortex-a53 -mcpu=cortex-a53+crypto+crc
+endif
 endif
 
 ifeq ($(cc-name),clang)

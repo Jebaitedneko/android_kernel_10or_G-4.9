@@ -22,7 +22,11 @@ aes-ce-cipher-y := aes-ce-cipher-glue.o aes-ce-cipher-core.o
 ifeq ($(CONFIG_ARCH_MSM8953), y)
 CFLAGS_aes-ce-cipher-core.o += -mcpu=cortex-a53+crypto+crc -Wa,-mcpu=cortex-a53+crypto+crc -mtune=cortex-a53
 else
+ifeq ($(CONFIG_ARCH_MSM8937), y)
+CFLAGS_aes-ce-cipher-core.o += -mcpu=cortex-a53+crypto+crc -Wa,-mcpu=cortex-a53+crypto+crc -mtune=cortex-a53
+else
 CFLAGS_aes-ce-cipher-core.o += -march=armv8-a+crypto -Wa,-march=armv8-a+crypto
+endif
 endif
 CFLAGS_aes-ce-cipher-core.o += $(DISABLE_LTO) $(call cc-option,-no-integrated-as)
 
