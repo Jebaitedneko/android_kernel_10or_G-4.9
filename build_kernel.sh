@@ -4,6 +4,8 @@
 
 source anykernel/build_helper.sh
 
+[[ $3 == 'e'                ]] && holland1
+
 [[ $1 == 'n' || $1 == 'dn'  ]] && nontreble
 [[ $2 == 's'                ]] && noslmk
 [[ $2 == 'flto'             ]] && full_lto

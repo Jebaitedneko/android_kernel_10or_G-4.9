@@ -55,6 +55,22 @@ full_lto
 echo "CONFIG_THINLTO=y" >> $CFG_DIR/final_defconfig
 }
 
+holland1() {
+sed -i "/CONFIG_ARCH_MSM8953/d" $CFG_DIR/final_defconfig
+sed -i "/CONFIG_MACH_TENOR_G/d" $CFG_DIR/final_defconfig
+sed -i "/CONFIG_PINCTRL_MSM8953/d" $CFG_DIR/final_defconfig
+sed -i "/CONFIG_MSM_ISPIF/d" $CFG_DIR/final_defconfig
+echo "CONFIG_ARCH_MSM8937=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_MACH_TENOR_E=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_PINCTRL_MSM8937=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_MSM_ISPIF_V2=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_SYN_COOKIES=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_IP_SCTP=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_LEDS_QPNP_VIBRATOR=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_QCOM_DCC=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_MSMB_CAMERA_LEGACY=y" >> $CFG_DIR/final_defconfig
+}
+
 pcmake() {
 PATH="$TC_DIR/bin:${PATH}" \
 make	\
