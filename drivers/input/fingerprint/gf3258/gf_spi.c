@@ -22,7 +22,6 @@
 #include <linux/input.h>
 #include <linux/err.h>
 #include <linux/list.h>
-#include <linux/mutex.h>
 #include <linux/slab.h>
 #include <linux/delay.h>
 #include <linux/uaccess.h>
@@ -31,28 +30,109 @@
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
 #include <linux/platform_device.h>
-#include "gf_spi.h"
+#include <net/sock.h>
+#include <net/netlink.h>
 
-#define	WAKELOCK_HOLD_TIME	25 /* in ms */
-#define	GF_SPIDEV_NAME		"goodix,fingerprint"
-#define	GF_DEV_NAME			"goodix_fp"
-#define	GF_INPUT_NAME		"gf3258"
-#define	CHRD_DRIVER_NAME	"goodix_fp_spi"
-#define	CLASS_NAME		    "goodix_fp"
-#define	N_SPI_MINORS		32	/* ... up to 256 */
+#define GF_IOC_MAGIC            'g'
+#define GF_IOC_INIT             _IOR(GF_IOC_MAGIC, 0, uint8_t)
+#define GF_IOC_RESET            _IO(GF_IOC_MAGIC, 2)
+#define GF_IOC_ENABLE_IRQ       _IO(GF_IOC_MAGIC, 3)
+#define GF_IOC_DISABLE_IRQ      _IO(GF_IOC_MAGIC, 4)
+
+#define GF_SPIDEV_NAME			"goodix,fingerprint"
+#define GF_DEV_NAME				"goodix_fp"
+#define GF_INPUT_NAME			"gf3258"
+#define CHRD_DRIVER_NAME		"goodix_fp_spi"
+#define CLASS_NAME				"goodix_fp"
+#define N_SPI_MINORS			256
+
+#define GF_NET_EVENT_IRQ		1
+#define NETLINK_TEST			25
+#define MAX_MSGSIZE				16
+
+struct gf_dev {
+	dev_t devt;
+	struct list_head device_entry;
+	struct platform_device *spi;
+	struct input_dev *input;
+	unsigned users;
+	signed irq_gpio;
+	signed reset_gpio;
+	#ifdef CONFIG_MACH_TENOR_E
+	signed pwr_gpio;
+	signed id_gpio;
+	#endif
+	int irq;
+	int irq_enabled;
+};
 
 static int SPIDEV_MAJOR;
-
 static DECLARE_BITMAP(minors, N_SPI_MINORS);
 static LIST_HEAD(device_list);
-static DEFINE_MUTEX(device_list_lock);
-static struct wakeup_source fp_wakelock;
 static struct gf_dev gf;
 
-int gf_parse_dts(struct gf_dev* gf_dev)
-{
-	int rc = 0;
+static int pid = -1;
+static struct sock *nl_sk = NULL;
 
+static inline void sendnlmsg(char *message) {
+	struct sk_buff *skb_1;
+	struct nlmsghdr *nlh;
+	int len = NLMSG_SPACE(MAX_MSGSIZE);
+	int slen = 0;
+	if (!message || !nl_sk)
+		return;
+	skb_1 = alloc_skb(len, GFP_KERNEL);
+	if (!skb_1) {
+		pr_err("alloc_skb error\n");
+		return;
+	}
+	slen = strlen(message);
+	nlh = nlmsg_put(skb_1, 0, 0, 0, MAX_MSGSIZE, 0);
+
+	NETLINK_CB(skb_1).portid = 0;
+	NETLINK_CB(skb_1).dst_group = 0;
+
+	message[slen] = '\0';
+	memcpy(NLMSG_DATA(nlh), message, slen+1);
+
+	netlink_unicast(nl_sk, skb_1, pid, MSG_DONTWAIT);
+}
+
+static inline void nl_data_ready(struct sk_buff *__skb) {
+	struct sk_buff *skb;
+	struct nlmsghdr *nlh;
+	char str[16];
+	skb = skb_get (__skb);
+	if (skb->len >= NLMSG_SPACE(0)) {
+		nlh = nlmsg_hdr(skb);
+		memcpy(str, NLMSG_DATA(nlh), sizeof(str));
+		pid = nlh->nlmsg_pid;
+		kfree_skb(skb);
+	}
+}
+
+static inline void netlink_init(void) {
+	struct netlink_kernel_cfg netlink_cfg;
+	netlink_cfg.groups = 0;
+	netlink_cfg.flags = 0;
+	netlink_cfg.input = nl_data_ready;
+	netlink_cfg.cb_mutex = NULL;
+
+	nl_sk = netlink_kernel_create(&init_net, NETLINK_TEST, &netlink_cfg);
+
+	if (!nl_sk)
+	pr_err("create netlink socket error\n");
+}
+
+static inline void netlink_exit(void) {
+	if (!nl_sk)
+		return;
+
+	netlink_kernel_release(nl_sk);
+	nl_sk = NULL;
+}
+
+static inline int gf_parse_dts(struct gf_dev* gf_dev) {
 	gf_dev->reset_gpio = of_get_named_gpio(gf_dev->spi->dev.of_node,"goodix,gpio_reset",0);
 	pr_info("gf::reset_gpio:%d\n", gf_dev->reset_gpio);
 	gpio_request(gf_dev->reset_gpio, "goodix_reset");
@@ -66,44 +146,36 @@ int gf_parse_dts(struct gf_dev* gf_dev)
 	return 0;
 }
 
-void gf_cleanup(struct gf_dev	* gf_dev)
-{
+static inline void gf_cleanup(struct gf_dev	* gf_dev) {
 	pr_info("[info] %s\n",__func__);
-	if (gpio_is_valid(gf_dev->irq_gpio))
-	{
+	if (gpio_is_valid(gf_dev->irq_gpio)) {
 		gpio_free(gf_dev->irq_gpio);
 		pr_info("remove irq_gpio success\n");
 	}
-	if (gpio_is_valid(gf_dev->reset_gpio))
-	{
+	if (gpio_is_valid(gf_dev->reset_gpio)) {
 		gpio_free(gf_dev->reset_gpio);
 		pr_info("remove reset_gpio success\n");
 	}
-#ifdef CONFIG_MACH_TENOR_E
-	if (gpio_is_valid(gf_dev->pwr_gpio))
-	{
+	#ifdef CONFIG_MACH_TENOR_E
+	if (gpio_is_valid(gf_dev->pwr_gpio)) {
 		gpio_free(gf_dev->pwr_gpio);
 		pr_info("remove pwr_gpio success\n");
 	}
-	if (gpio_is_valid(gf_dev->id_gpio))
-	{
+	if (gpio_is_valid(gf_dev->id_gpio)) {
 		gpio_free(gf_dev->id_gpio);
 		pr_info("remove id_gpio success\n");
 	}
-#endif
+	#endif
 }
 
-static irqreturn_t gf_irq(int irq, void *handle)
-{
+static inline irqreturn_t gf_irq(int irq, void *handle) {
 	char msg[2] =  { 0x0 };
 	msg[0] = GF_NET_EVENT_IRQ;
-	__pm_wakeup_event(&fp_wakelock, WAKELOCK_HOLD_TIME);
 	sendnlmsg(msg);
 	return IRQ_HANDLED;
 }
 
-static int irq_setup(struct gf_dev *gf_dev)
-{
+static inline int irq_setup(struct gf_dev *gf_dev) {
 	int status;
 
 	gf_dev->irq = gpio_to_irq(gf_dev->irq_gpio);
@@ -121,15 +193,13 @@ static int irq_setup(struct gf_dev *gf_dev)
 	return status;
 }
 
-static void irq_cleanup(struct gf_dev *gf_dev)
-{
+static inline void irq_cleanup(struct gf_dev *gf_dev) {
 	gf_dev->irq_enabled = 0;
 	disable_irq_wake(gf_dev->irq);
 	free_irq(gf_dev->irq, gf_dev);
 }
 
-static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
-{
+static inline long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg) {
 	struct gf_dev *gf_dev = &gf;
 	int retval = 0;
 	u8 netlink_route = NETLINK_TEST;
@@ -145,56 +215,42 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		return -EFAULT;
 
 	switch (cmd) {
-	case GF_IOC_INIT:
-		pr_debug("%s GF_IOC_INIT\n", __func__);
-		if (copy_to_user((void __user *)arg, (void *)&netlink_route, sizeof(u8))) {
-			pr_err("GF_IOC_INIT failed\n");
-			retval = -EFAULT;
+		case GF_IOC_INIT:
+			pr_debug("%s GF_IOC_INIT\n", __func__);
+			if (copy_to_user((void __user *)arg, (void *)&netlink_route, sizeof(u8))) {
+				pr_err("GF_IOC_INIT failed\n");
+				retval = -EFAULT;
+				break;
+			}
 			break;
-		}
-		break;
-	case GF_IOC_EXIT:
-		pr_debug("%s GF_IOC_EXIT\n", __func__);
-		break;
-	case GF_IOC_DISABLE_IRQ:
-		pr_debug("%s GF_IOC_DISABEL_IRQ\n", __func__);
-			gf_dev->irq_enabled = 0;
-			disable_irq_wake(gf_dev->irq);
-		break;
-	case GF_IOC_ENABLE_IRQ:
-		pr_debug("%s GF_IOC_ENABLE_IRQ\n", __func__);
-			enable_irq_wake(gf_dev->irq);
-			gf_dev->irq_enabled = 1;
-		break;
-	case GF_IOC_RESET:
-		pr_debug("%s GF_IOC_RESET\n", __func__);
-			gpio_direction_output(gf_dev->reset_gpio, 1);
-			gpio_set_value(gf_dev->reset_gpio, 0);
-			mdelay(3);
-			gpio_set_value(gf_dev->reset_gpio, 1);
-			mdelay(3);
-		break;
-	case GF_IOC_ENABLE_POWER:
-		pr_debug("%s GF_IOC_ENABLE_POWER\n", __func__);
-			pr_info("---- power on ----\n");
-		break;
-	case GF_IOC_DISABLE_POWER:
-		pr_debug("%s GF_IOC_DISABLE_POWER\n", __func__);
-			pr_info("---- power off ----\n");
-		break;
-	default:
-		break;
+		case GF_IOC_DISABLE_IRQ:
+			pr_debug("%s GF_IOC_DISABLE_IRQ\n", __func__);
+				gf_dev->irq_enabled = 0;
+				disable_irq_wake(gf_dev->irq);
+			break;
+		case GF_IOC_ENABLE_IRQ:
+			pr_debug("%s GF_IOC_ENABLE_IRQ\n", __func__);
+				enable_irq_wake(gf_dev->irq);
+				gf_dev->irq_enabled = 1;
+			break;
+		case GF_IOC_RESET:
+			pr_debug("%s GF_IOC_RESET\n", __func__);
+				gpio_direction_output(gf_dev->reset_gpio, 1);
+				gpio_set_value(gf_dev->reset_gpio, 0);
+				mdelay(3);
+				gpio_set_value(gf_dev->reset_gpio, 1);
+				mdelay(3);
+			break;
+		default:
+			break;
 	}
 
 	return retval;
 }
 
-static int gf_open(struct inode *inode, struct file *filp)
-{
+static inline int gf_open(struct inode *inode, struct file *filp) {
 	struct gf_dev *gf_dev = &gf;
 	int status = -ENXIO;
-
-	mutex_lock(&device_list_lock);
 
 	list_for_each_entry(gf_dev, &device_list, device_entry) {
 		if (gf_dev->devt == inode->i_rdev) {
@@ -205,91 +261,73 @@ static int gf_open(struct inode *inode, struct file *filp)
 	}
 
 	if (status == 0) {
-		if (status == 0) {
-			gf_dev->users++;
-			filp->private_data = gf_dev;
-			nonseekable_open(inode, filp);
-			pr_info("Succeed to open device. irq = %d\n",
-					gf_dev->irq);
-			if (gf_dev->users == 1) {
-				status = gf_parse_dts(gf_dev);
-				if (status)
-					return status;
+		gf_dev->users++;
+		filp->private_data = gf_dev;
+		nonseekable_open(inode, filp);
+		pr_info("Succeed to open device. irq = %d\n",
+				gf_dev->irq);
+		if (gf_dev->users == 1) {
+			status = gf_parse_dts(gf_dev);
+			if (status)
+				return status;
 
-				status = irq_setup(gf_dev);
-				if (status)
-					gf_cleanup(gf_dev);
-			}
-			gpio_direction_output(gf_dev->reset_gpio, 1);
-			gpio_set_value(gf_dev->reset_gpio, 0);
-			mdelay(3);
-			gpio_set_value(gf_dev->reset_gpio, 1);
-			mdelay(3);
+			status = irq_setup(gf_dev);
+			if (status)
+				gf_cleanup(gf_dev);
 		}
+		gpio_direction_output(gf_dev->reset_gpio, 1);
+		gpio_set_value(gf_dev->reset_gpio, 0);
+		mdelay(3);
+		gpio_set_value(gf_dev->reset_gpio, 1);
+		mdelay(3);
 	} else {
 		pr_info("No device for minor %d\n", iminor(inode));
 	}
-	mutex_unlock(&device_list_lock);
 
 	return status;
 }
 
-static int gf_release(struct inode *inode, struct file *filp)
-{
+static inline int gf_release(struct inode *inode, struct file *filp) {
 	struct gf_dev *gf_dev = &gf;
 	int status = 0;
 
-	mutex_lock(&device_list_lock);
 	gf_dev = filp->private_data;
 	filp->private_data = NULL;
 
 	/*last close?? */
 	gf_dev->users--;
 	if (!gf_dev->users) {
-
 		pr_info("disble_irq. irq = %d\n", gf_dev->irq);
-
 		irq_cleanup(gf_dev);
 		gf_cleanup(gf_dev);
 		pr_info("---- power off ----\n");
 	}
-	mutex_unlock(&device_list_lock);
+
 	return status;
 }
 
 static const struct file_operations gf_fops = {
 	.owner = THIS_MODULE,
-	/* REVISIT switch to aio primitives, so that userspace
-	 * gets more complete API coverage.  It'll simplify things
-	 * too, except for the locking.
-	 */
 	.unlocked_ioctl = gf_ioctl,
 	.open = gf_open,
 	.release = gf_release,
 };
 
 static struct class *gf_class;
-static int gf_probe(struct platform_device *pdev)
-
-{
+static inline int gf_probe(struct platform_device *pdev) {
 	struct gf_dev *gf_dev = &gf;
 	int status = -EINVAL;
 	unsigned long minor;
-	int i;
 
-	/* Initialize the driver data */
 	INIT_LIST_HEAD(&gf_dev->device_entry);
 	gf_dev->spi = pdev;
 	gf_dev->irq_gpio = -EINVAL;
 	gf_dev->reset_gpio = -EINVAL;
-#ifdef CONFIG_MACH_TENOR_E
+	#ifdef CONFIG_MACH_TENOR_E
 	gf_dev->pwr_gpio = -EINVAL;
 	gf_dev->id_gpio = -EINVAL;
-#endif
-	/* If we can allocate a minor number, hook up this device.
-	 * Reusing minors is fine so long as udev or mdev is working.
-	 */
-	mutex_lock(&device_list_lock);
+	#endif
+
 	minor = find_first_zero_bit(minors, N_SPI_MINORS);
 	if (minor < N_SPI_MINORS) {
 		struct device *dev;
@@ -301,7 +339,6 @@ static int gf_probe(struct platform_device *pdev)
 	} else {
 		dev_dbg(&gf_dev->spi->dev, "no minor number available!\n");
 		status = -ENODEV;
-		mutex_unlock(&device_list_lock);
 		return status;
 	}
 
@@ -312,51 +349,40 @@ static int gf_probe(struct platform_device *pdev)
 		gf_dev->devt = 0;
 		return status;
 	}
-	mutex_unlock(&device_list_lock);
 
-		/*input device subsystem */
-		gf_dev->input = input_allocate_device();
-		if (gf_dev->input == NULL) {
-			pr_err("%s, failed to allocate input device\n", __func__);
-			status = -ENOMEM;
-			if (gf_dev->input != NULL)
-				input_free_device(gf_dev->input);
+	gf_dev->input = input_allocate_device();
+	if (gf_dev->input == NULL) {
+		pr_err("%s, failed to allocate input device\n", __func__);
+		status = -ENOMEM;
+		if (gf_dev->input != NULL)
+			input_free_device(gf_dev->input);
+	}
+
+	gf_dev->input->name = GF_INPUT_NAME;
+	status = input_register_device(gf_dev->input);
+	if (status) {
+		pr_err("failed to register input device\n");
+		if (gf_dev->devt != 0) {
+			pr_info("Err: status = %d\n", status);
+			list_del(&gf_dev->device_entry);
+			device_destroy(gf_class, gf_dev->devt);
+			clear_bit(MINOR(gf_dev->devt), minors);
 		}
-
-		gf_dev->input->name = GF_INPUT_NAME;
-		status = input_register_device(gf_dev->input);
-		if (status) {
-			pr_err("failed to register input device\n");
-			if (gf_dev->devt != 0) {
-				pr_info("Err: status = %d\n", status);
-				mutex_lock(&device_list_lock);
-				list_del(&gf_dev->device_entry);
-				device_destroy(gf_class, gf_dev->devt);
-				clear_bit(MINOR(gf_dev->devt), minors);
-				mutex_unlock(&device_list_lock);
-			}
-		}
-
-	wakeup_source_init(&fp_wakelock, "fp_wakelock");
+	}
 
 	return status;
 }
 
-static int gf_remove(struct platform_device *pdev)
-{
+static inline int gf_remove(struct platform_device *pdev) {
 	struct gf_dev *gf_dev = &gf;
 
-	wakeup_source_trash(&fp_wakelock);
 	if (gf_dev->input)
 		input_unregister_device(gf_dev->input);
 	input_free_device(gf_dev->input);
 
-	/* prevent new opens */
-	mutex_lock(&device_list_lock);
 	list_del(&gf_dev->device_entry);
 	device_destroy(gf_class, gf_dev->devt);
 	clear_bit(MINOR(gf_dev->devt), minors);
-	mutex_unlock(&device_list_lock);
 
 	return 0;
 }
@@ -376,11 +402,10 @@ static struct platform_driver gf_driver = {
 	.remove = gf_remove,
 };
 
-static int __init gf_init(void)
-{
+static inline int __init gf_init(void) {
 	int status;
 
-#ifdef CONFIG_MACH_TENOR_E
+	#ifdef CONFIG_MACH_TENOR_E
 	struct gf_dev *gf_dev = &gf;
 	gf_dev->pwr_gpio = of_get_named_gpio(gf_dev->spi->dev.of_node, "goodix,gpio_pwr",0);
 	gpio_request(gf_dev->pwr_gpio, "goodix_pwr");
@@ -393,12 +418,7 @@ static int __init gf_init(void)
 	gf_dev->id_gpio = of_get_named_gpio(gf_dev->spi->dev.of_node, "goodix,gpio_id",0);
 	gpio_request(gf_dev->id_gpio, "goodix_id");
 	gpio_direction_input(gf_dev->id_gpio);
-#endif
-
-	/* Claim our 256 reserved device numbers.  Then register a class
-	 * that will key udev/mdev to add/remove /dev nodes.  Last, register
-	 * the driver which manages those device numbers.
-	 */
+	#endif
 
 	BUILD_BUG_ON(N_SPI_MINORS > 256);
 	status = register_chrdev(SPIDEV_MAJOR, CHRD_DRIVER_NAME, &gf_fops);
@@ -427,8 +447,7 @@ static int __init gf_init(void)
 }
 module_init(gf_init);
 
-static void __exit gf_exit(void)
-{
+static inline void __exit gf_exit(void) {
 	netlink_exit();
 	platform_driver_unregister(&gf_driver);
 	class_destroy(gf_class);
