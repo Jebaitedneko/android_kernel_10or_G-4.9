@@ -1,1 +1,5 @@
+ifeq ($(CONFIG_MACH_TENOR_E), y)
+obj-$(CONFIG_FINGERPRINT_GF3258) += gf3258-holland1/
+else
 obj-$(CONFIG_FINGERPRINT_GF3258) += gf3258/
+endif
