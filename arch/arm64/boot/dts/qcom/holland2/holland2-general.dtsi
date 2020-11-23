@@ -45,6 +45,14 @@
 		};
 	};
 
+	reserved_memory: reserved-memory {
+
+		ramoops@9ff00000 {
+			compatible = "ramoops";
+			reg = <0x0 0x9ff00000 0x0 0x300000>;
+		};
+	};
+
 	qrd_batterydata: qcom,battery-data {
 		#include "batterydata_Amazon_4V4_4000mAh.dtsi"
 	};
