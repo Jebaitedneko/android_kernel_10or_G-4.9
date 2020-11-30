@@ -60,6 +60,8 @@
 				qcom,decimation = <1>;
 				qcom,fast-avg-setup = <5>;
 			};
+
+			/delete-node/ chan@11;
 		};
 
 		pm8953_adc_tm: vadc@3400 {
@@ -68,12 +70,18 @@
 				qcom,decimation = <1>;
 				qcom,fast-avg-setup = <5>;
 			};
+
+			/delete-node/ chan@11;
 		};
 
 		/delete-node/ qcom,pm8953_typec@bf00;
 	};
 
 	qcom,pmi8950@2 {
+
+		pmi8950_vadc: vadc@3100 {
+			status = "disabled";
+		};
 
 		pmi8950_gpios: gpios {
 
@@ -161,5 +169,13 @@
 
 	xo-therm-adc {
 		polling-delay = <1000>;
+	};
+
+	chg-temp-adc {
+		status = "disabled";
+	};
+
+	pa-therm1-adc {
+		status = "disabled";
 	};
 };
