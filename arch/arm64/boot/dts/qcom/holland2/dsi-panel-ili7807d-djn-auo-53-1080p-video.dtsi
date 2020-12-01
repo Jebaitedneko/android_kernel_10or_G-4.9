@@ -50,6 +50,9 @@
 		qcom,mdss-dsi-bl-max-level = <4096>;
 		qcom,mdss-dsi-dma-trigger = "trigger_sw";
 		qcom,mdss-dsi-mdp-trigger = "none";
+		qcom,ulps-enabled;
+		qcom,suspend-ulps-enabled;
+		qcom,mdss-dsi-panel-jitter = <0x1 0xa>;
 		qcom,mdss-dsi-on-command = [
 			// AUO H546DAN09.1 
 			29 01 00 00 00 00 04  FF 78 07 01	//Page1
