@@ -11,7 +11,7 @@ ccache -M 100G
 
 CFG_DIR=$(pwd)/arch/arm64/configs
 
-CFG=$CFG_DIR/holland2_defconfig
+CFG=$CFG_DIR/mido_defconfig
 
 TC_DIR=${HOME}/android/TOOLS/proton-clang
 
