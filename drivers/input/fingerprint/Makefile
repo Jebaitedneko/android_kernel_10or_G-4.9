@@ -3,3 +3,5 @@ obj-$(CONFIG_FINGERPRINT_GF3258) += gf3258-holland1/
 else
 obj-$(CONFIG_FINGERPRINT_GF3258) += gf3258/
 endif
+obj-$(CONFIG_FINGERPRINT_GOODIX_GF3208_C6)	+= goodix_mido/
+obj-$(CONFIG_FINGERPRINT_FPC1020_C6)		+= fpc_mido/
