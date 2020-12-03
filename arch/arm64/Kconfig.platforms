@@ -364,4 +364,9 @@ config MACH_TENOR_E
 	help
 	  This enables support for 10or E
 
+config MACH_XIAOMI_C6
+	bool "Xiaomi Redmi Note 4"
+	help
+	  This enables support for Xiaomi Redmi Note 4
+
 endmenu
