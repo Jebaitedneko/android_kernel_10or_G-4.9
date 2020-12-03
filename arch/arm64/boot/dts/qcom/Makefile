@@ -4,6 +4,7 @@ dtb-$(CONFIG_MACH_TENOR_E) += msm8937-pmi8937-qrd-sku2-holland1-nontreble.dtb
 else
 dtb-$(CONFIG_MACH_TENOR_G) := msm8953-qrd-sku3-holland2.dtb
 dtb-$(CONFIG_MACH_TENOR_E) += msm8937-pmi8937-qrd-sku2-holland1.dtb
+dtb-$(CONFIG_MACH_XIAOMI_C6) := msm8953-qrd-sku3-mido.dtb
 endif
 
 # dtb-$(CONFIG_ARCH_QCOM)	+= apq8016-sbc.dtb msm8916-mtp.dtb
