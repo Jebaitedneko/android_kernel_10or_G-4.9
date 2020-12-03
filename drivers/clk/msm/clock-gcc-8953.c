@@ -3767,6 +3767,10 @@ static void override_for_8953(struct platform_device *pdev)
 
 	bin = (config_efuse >> 8) & 0x7;
 
+	#ifdef CONFIG_MACH_XIAOMI_C6
+	bin = 7; // enforce speed-bin7 for mido
+	#endif
+
 	if (bin == SPEED_BIN) {
 		vcodec0_clk_src.freq_tbl = ftbl_vcodec0_clk_src_540MHz;
 		vcodec0_clk_src.c.fmax[VDD_DIG_HIGH] = 540000000;

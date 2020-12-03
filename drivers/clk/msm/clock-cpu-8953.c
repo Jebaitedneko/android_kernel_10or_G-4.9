@@ -691,6 +691,10 @@ static void get_speed_bin(struct platform_device *pdev, int *bin,
 
 	*bin = (pte_efuse >> 8) & 0x7;
 
+	#ifdef CONFIG_MACH_XIAOMI_C6
+	*bin = 7; // enforce speed-bin7 for mido
+	#endif
+
 	dev_info(&pdev->dev, "Speed bin: %d PVS Version: %d\n", *bin,
 								*version);
 }
