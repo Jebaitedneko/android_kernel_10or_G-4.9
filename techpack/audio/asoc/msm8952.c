@@ -92,9 +92,15 @@ static struct wcd_mbhc_config mbhc_cfg = {
 	.key_code[2] = KEY_VOLUMEDOWN,
 	.key_code[3] = 0,
 #else
+#if (defined CONFIG_MACH_XIAOMI_C6)
+	.key_code[1] = BTN_1,
+	.key_code[2] = BTN_2,
+	.key_code[3] = 0,
+#else
 	.key_code[1] = KEY_VOICECOMMAND,
 	.key_code[2] = KEY_VOLUMEUP,
 	.key_code[3] = KEY_VOLUMEDOWN,
+#endif
 #endif
 	.key_code[4] = 0,
 	.key_code[5] = 0,
@@ -360,8 +366,10 @@ int is_ext_spk_gpio_support(struct platform_device *pdev,
 				__func__, pdata->spk_ext_pa1_gpio);
 		}
 	}
-	gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
 	gpio_direction_output(pdata->spk_ext_pa1_gpio, 0);
+#endif
+#if (defined CONFIG_MACH_TENOR_G) || (defined CONFIG_MACH_XIAOMI_C6)
+	gpio_direction_output(pdata->spk_ext_pa_gpio, 0);
 #endif
 	return 0;
 }
@@ -370,7 +378,7 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 {
 	struct snd_soc_card *card = codec->component.card;
 	struct msm_asoc_mach_data *pdata = snd_soc_card_get_drvdata(card);
-#ifdef CONFIG_MACH_TENOR_G
+#if (defined CONFIG_MACH_TENOR_G) || (defined CONFIG_MACH_XIAOMI_C6)
 	int pa_mode = EXT_PA_MODE;
 #else
 	int ret;
@@ -393,17 +401,19 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 		enable ? "Enable" : "Disable");
 
 	if (enable) {
-#if (defined CONFIG_MACH_TENOR_G) || (defined CONFIG_MACH_TENOR_E)
-#ifdef CONFIG_MACH_TENOR_G
+#if (defined CONFIG_MACH_TENOR_G) || (defined CONFIG_MACH_TENOR_E) || (defined CONFIG_MACH_XIAOMI_C6)
+#if (defined CONFIG_MACH_TENOR_G) || (defined CONFIG_MACH_XIAOMI_C6)
 		while (pa_mode > 0) {
 			gpio_set_value_cansleep(pdata->spk_ext_pa_gpio, 0);
 			udelay(2);
 			gpio_set_value_cansleep(pdata->spk_ext_pa_gpio, enable);
 			udelay(2);
+			#if (defined CONFIG_MACH_TENOR_G)
 			gpio_set_value_cansleep(pdata->spk_ext_pa1_gpio, 0);
 			udelay(2);
 			gpio_set_value_cansleep(pdata->spk_ext_pa1_gpio, enable);
 			udelay(2);
+			#endif
 			pa_mode--;
 		}
 #endif
@@ -419,7 +429,7 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 		gpio_direction_output(pdata->spk_ext_pa_gpio, 1);
 #endif
 #endif
-#if !(defined CONFIG_MACH_TENOR_G) && !(defined CONFIG_MACH_TENOR_E)
+#if !(defined CONFIG_MACH_TENOR_G) && !(defined CONFIG_MACH_TENOR_E) && !(defined CONFIG_MACH_XIAOMI_C6)
 		ret =  msm_cdc_pinctrl_select_active_state(
 					pdata->spk_ext_pa_gpio_p);
 		if (ret) {
@@ -434,7 +444,7 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 #ifdef CONFIG_MACH_TENOR_G
 		gpio_set_value_cansleep(pdata->spk_ext_pa1_gpio, enable);
 #endif
-#if !(defined CONFIG_MACH_TENOR_G) && !(defined CONFIG_MACH_TENOR_E)
+#if !(defined CONFIG_MACH_TENOR_G) && !(defined CONFIG_MACH_TENOR_E) && !(defined CONFIG_MACH_XIAOMI_C6)
 		ret = msm_cdc_pinctrl_select_sleep_state(
 				pdata->spk_ext_pa_gpio_p);
 		if (ret) {
@@ -1597,7 +1607,7 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 		return NULL;
 
 #define S(X, Y) ((WCD_MBHC_CAL_PLUG_TYPE_PTR(msm8952_wcd_cal)->X) = (Y))
-#if (defined CONFIG_MACH_TENOR_G) || (defined CONFIG_MACH_TENOR_E)
+#if (defined CONFIG_MACH_TENOR_G) || (defined CONFIG_MACH_TENOR_E) || (defined CONFIG_MACH_XIAOMI_C6)
 	S(v_hs_max, 1700);
 #else
 	S(v_hs_max, 1500);
@@ -1624,7 +1634,7 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 	 * 210-290 == Button 2
 	 * 360-680 == Button 3
 	 */
-#if defined(CONFIG_MACH_TENOR_G)
+#if defined(CONFIG_MACH_TENOR_G) || (defined CONFIG_MACH_XIAOMI_C6)
 	btn_low[0] = 80;
 	btn_high[0] = 80;
 	btn_low[1] = 220;

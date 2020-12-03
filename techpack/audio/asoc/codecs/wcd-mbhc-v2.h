@@ -140,7 +140,7 @@ do {                                                    \
 #define OCP_ATTEMPT 20
 #define HS_DETECT_PLUG_TIME_MS (3 * 1000)
 #define SPECIAL_HS_DETECT_TIME_MS (2 * 1000)
-#ifdef CONFIG_MACH_TENOR_G
+#if (defined CONFIG_MACH_TENOR_G) || (defined CONFIG_MACH_XIAOMI_C6)
 #define MBHC_BUTTON_PRESS_THRESHOLD_MIN 750
 #else
 #define MBHC_BUTTON_PRESS_THRESHOLD_MIN 250
