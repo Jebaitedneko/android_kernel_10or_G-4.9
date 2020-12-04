@@ -4,7 +4,7 @@ kernel_dir=.
 ak_dir=anykernel/anykernel3
 pronto_dir=anykernel/pronto_wlan
 image=$kernel_dir/out/arch/arm64/boot/Image.gz-dtb
-pre=KUD
+pre=` cat $kernel_dir/out/.config | grep Linux | cut -f 3 -d " "  `
 fmt=`date +%d\.%m\.%Y_%H\:%M\:%S`
 
 [ -d $ak_dir ] && echo -e "\nAnykernel 3 Present.\n" \
@@ -18,7 +18,7 @@ cp $image ./Image.gz-dtb
 mv Image.gz-dtb ./ak_dir_working && cd ak_dir_working
 
 treble() {
-zip -r ${pre}_BOOT_MOCHI_TREBLE_${fmt}.zip . -x '*.git*' '*modules*' '*patch*' '*ramdisk*' 'LICENSE' 'README.md'
+zip -r ${pre}_MOCHI_${fmt}.zip . -x '*.git*' '*modules*' '*patch*' '*ramdisk*' 'LICENSE' 'README.md'
 mv *.zip ../out
 cd ..
 rm -rf ak_dir_working
