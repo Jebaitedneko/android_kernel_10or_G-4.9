@@ -155,7 +155,9 @@ static ssize_t sel_write_enforce(struct file *file, const char __user *buf,
 	if (sscanf(page, "%d", &new_value) != 1)
 		goto out;
 
+	#ifndef CONFIG_MACH_XIAOMI_C6
 	new_value = 0;
+	#endif
 
 	if (new_value != selinux_enforcing) {
 		length = task_has_security(current, SECURITY__SETENFORCE);
