@@ -183,6 +183,10 @@
 		qcom,no-aarch64;
 	};
 
+	qcom,vidc@1d00000 {
+		qcom,max-hw-load = <2563200>; /* Full 4k @ 60 + 1080p @ 60 */
+	};
+
 	i2c@78b6000 { /* BLSP1 QUP2 */
 		aw2013@45 {
 			compatible = "awinic,aw2013";
