@@ -127,7 +127,16 @@ $(obj)/configs.o: $(obj)/config_data.h
 # config_data.h contains the same information as ikconfig.h but gzipped.
 # Info from config_data can be extracted from /proc/config*
 targets += config_data.gz
+ifdef CONFIG_MACH_XIAOMI_C6
+$(obj)/config_data.gz: arch/arm64/configs/msm8953_defconfig FORCE
+else
+ifdef CONFIG_MACH_TENOR_G
+$(obj)/config_data.gz: arch/arm64/configs/msm8953_defconfig FORCE
+else
 $(obj)/config_data.gz: $(KCONFIG_CONFIG) FORCE
+endif
+endif
+
 	$(call if_changed,gzip)
 
       filechk_ikconfiggz = (echo "static const char kernel_config_data[] __used = MAGIC_START"; cat $< | scripts/basic/bin2c; echo "MAGIC_END;")
