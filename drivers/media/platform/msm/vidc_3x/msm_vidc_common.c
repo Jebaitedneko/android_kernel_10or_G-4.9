@@ -3856,7 +3856,7 @@ int msm_comm_qbuf(struct msm_vidc_inst *inst, struct vb2_buffer *vb)
 	 * 1) Hardware isn't ready (that's simple)
 	 */
 	if (!defer)
-		defer = inst->state != MSM_VIDC_START_DONE;
+		defer = (inst->state != MSM_VIDC_START_DONE);
 
 	/*
 	 * 2) The client explicitly tells us not to because it wants this
@@ -3864,11 +3864,11 @@ int msm_comm_qbuf(struct msm_vidc_inst *inst, struct vb2_buffer *vb)
 	 * capabilities) is completely determined by the client.
 	 */
 	if (!defer)
-		defer = vbuf && vbuf->flags & V4L2_MSM_BUF_FLAG_DEFER;
+		defer = (vbuf && vbuf->flags & V4L2_MSM_BUF_FLAG_DEFER);
 
 	/* 3) If we're in batch mode, we must have full batches of both types */
 	if (!defer)
-		defer =batch_mode && (!output_count || !capture_count);
+		defer = (batch_mode && (!output_count || !capture_count));
 
 	if (defer) {
 		dprintk(VIDC_DBG, "Deferring queue of %pK\n", vb);
