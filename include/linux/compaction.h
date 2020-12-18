@@ -243,6 +243,4 @@ static inline void compaction_unregister_node(struct node *node)
 }
 #endif /* CONFIG_COMPACTION && CONFIG_SYSFS && CONFIG_NUMA */
 
-extern void compact_nodes(void);
-
 #endif /* _LINUX_COMPACTION_H */
