@@ -128,10 +128,10 @@ $(obj)/configs.o: $(obj)/config_data.h
 # Info from config_data can be extracted from /proc/config*
 targets += config_data.gz
 ifdef CONFIG_MACH_XIAOMI_C6
-$(obj)/config_data.gz: arch/arm64/configs/msm8953_defconfig FORCE
+$(obj)/config_data.gz: arch/arm64/configs/msm8953-perf_full_defconfig FORCE
 else
 ifdef CONFIG_MACH_TENOR_G
-$(obj)/config_data.gz: arch/arm64/configs/msm8953_defconfig FORCE
+$(obj)/config_data.gz: arch/arm64/configs/msm8953-perf_full_defconfig FORCE
 else
 $(obj)/config_data.gz: $(KCONFIG_CONFIG) FORCE
 endif
