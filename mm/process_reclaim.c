@@ -21,7 +21,6 @@
 #include <linux/notifier.h>
 #include <linux/vmpressure.h>
 #include <linux/delay.h>
-#include <linux/compaction.h>
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/process_reclaim.h>
@@ -240,9 +239,6 @@ static void sort_and_kill_tasks(struct task_struct *tasks_to_kill[], int tsi)
 			put_task_struct(tsk);
 
 	}
-
-	/* Perform compaction after killing tasks */
-	compact_nodes();
 }
 
 static void swap_fn(struct work_struct *work)
