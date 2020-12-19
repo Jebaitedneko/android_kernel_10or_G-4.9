@@ -5,6 +5,7 @@
 source anykernel/build_helper.sh
 
 [[ $3 == 'e'                ]] && holland1
+[[ $3 == 'm'                ]] && mido
 
 [[ $1 == 'n' || $1 == 'dn'  ]] && nontreble
 [[ $2 == 's'                ]] && noslmk

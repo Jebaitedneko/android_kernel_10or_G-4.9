@@ -11,7 +11,7 @@ ccache -M 100G
 
 CFG_DIR=$(pwd)/arch/arm64/configs
 
-CFG=$CFG_DIR/mido_defconfig
+CFG=$CFG_DIR/holland2_defconfig
 
 TC_DIR=${HOME}/android/TOOLS/proton-clang
 
@@ -69,6 +69,29 @@ echo "CONFIG_IP_SCTP=y" >> $CFG_DIR/final_defconfig
 echo "CONFIG_LEDS_QPNP_VIBRATOR=y" >> $CFG_DIR/final_defconfig
 echo "CONFIG_QCOM_DCC=y" >> $CFG_DIR/final_defconfig
 echo "CONFIG_MSMB_CAMERA_LEGACY=y" >> $CFG_DIR/final_defconfig
+}
+
+mido() {
+sed -i "/CONFIG_MACH_TENOR_G/d" $CFG_DIR/final_defconfig
+sed -i "/CONFIG_TOUCHSCREEN_GT9XX_v28/d" $CFG_DIR/final_defconfig
+sed -i "/CONFIG_FINGERPRINT_GF3258/d" $CFG_DIR/final_defconfig
+echo "CONFIG_MACH_XIAOMI_C6=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_TOUCHSCREEN_IST3038C=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_TOUCHSCREEN_GT9XX_v24=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_TOUCHSCREEN_GT9XX_v24_UPDATE=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_TOUCHSCREEN_GT9XX_v24_TOOL=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_FINGERPRINT_GOODIX_GF3208_C6=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_FINGERPRINT_FPC1020_C6=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_LEDS_AW2013=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_MEDIA_RC_SUPPORT=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_LIRC=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_RC_DEVICES=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_IR_PWM=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_MSMB_CAMERA_LEGACY=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_IR_MCE_KBD_DECODER=n" >> $CFG_DIR/final_defconfig
+echo "CONFIG_F2FS_FS=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_F2FS_FS_SECURITY=y" >> $CFG_DIR/final_defconfig
+echo "CONFIG_F2FS_FS_ENCRYPTION=y" >> $CFG_DIR/final_defconfig
 }
 
 pcmake() {
