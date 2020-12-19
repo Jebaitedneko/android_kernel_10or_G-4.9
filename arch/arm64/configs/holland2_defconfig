@@ -358,8 +358,10 @@ CONFIG_INPUT_UINPUT=y
 CONFIG_SERIAL_MSM_HS=y
 CONFIG_SERIAL_MSM_SMD=y
 CONFIG_DIAG_USES_SMD=y
+# CONFIG_HW_RANDOM is not set
 CONFIG_MSM_SMD_PKT=y
 CONFIG_MSM_ADSPRPC=y
+CONFIG_SRANDOM=y
 CONFIG_I2C_CHARDEV=y
 CONFIG_I2C_MSM_V2=y
 CONFIG_SPI=y
@@ -651,43 +653,3 @@ CONFIG_CRYPTO_AES_ARM64_CE_BLK=y
 CONFIG_CRYPTO_AES_ARM64_NEON_BLK=y
 CONFIG_CRYPTO_CRC32_ARM64=y
 CONFIG_QMI_ENCDEC=y
-
-### PS: The two reverts are only needed if it was picked earlier.
-
-### Initial Merge:
-
-# git remote add srandom https://github.com/josenk/srandom
-# git fetch srandom master
-# git merge -s ours --no-commit --allow-unrelated-histories FETCH_HEAD
-# git read-tree --prefix=drivers/char/srandom -u FETCH_HEAD
-# git commit
-
-### For Further Updations:
-
-# git fetch srandom master
-# git merge -X subtree=drivers/char/srandom FETCH_HEAD
-
-### For Testing Before And After Random Performance:
-
-# su
-# time dd if=/dev/srandom of=/dev/null count=64k bs=64k
-# time dd if=/dev/urandom of=/dev/null count=64k bs=64k
-# time dd if=/dev/random of=/dev/null count=64k bs=64k
-
-### My Benchmark:
-
-# Before Commits:
-# urandom: 4.0Gb, 29.20s, 140M/s
-# random:  3.0Mb,  6.52s, 485K/s
-
-# After Commits:
-# srandom: 4.0Gb, 4.12s, 992M/s
-# urandom: 4.0Gb, 4.12s, 992M/s
-# random:  4.0Gb. 4.11s, 996M/s
-
-CONFIG_SRANDOM=y
-
-CONFIG_HW_RANDOM=n
-CONFIG_HW_RANDOM_TIMERIOMEM=n
-CONFIG_HW_RANDOM_MSM=n
-CONFIG_HW_RANDOM_MSM_LEGACY=n
