@@ -46,6 +46,7 @@
 #include "wlan_hdd_assoc.h"
 #include "sme_Api.h"
 #include "vos_sched.h"
+#include <disable.h>
 
 static tANI_S32 wlan_hdd_get_tdls_discovery_peer_cnt(tdlsCtx_t *pHddTdlsCtx);
 static tANI_S32 wlan_hdd_tdls_peer_reset_discovery_processed(tdlsCtx_t *pHddTdlsCtx);
