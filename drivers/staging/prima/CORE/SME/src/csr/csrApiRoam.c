@@ -2897,7 +2897,6 @@ eHalStatus csrRoamCallCallback(tpAniSirGlobal pMac, tANI_U32 sessionId, tCsrRoam
     else
     {
        smsLog(pMac, LOGE, "Session ID:%d is not valid", sessionId);
-       VOS_ASSERT(0);
        return eHAL_STATUS_FAILURE;
     }
 
@@ -6803,13 +6802,7 @@ eHalStatus csrRoamCopyConnectedProfile(tpAniSirGlobal pMac, tANI_U32 sessionId, 
     do
     {
         vos_mem_set(pDstProfile, sizeof(tCsrRoamProfile), 0);
-
-        pDstProfile->BSSIDs.bssid = vos_mem_malloc(sizeof(tCsrBssid));
-        if ( NULL == pDstProfile->BSSIDs.bssid )
-            status = eHAL_STATUS_FAILURE;
-        else
-            status = eHAL_STATUS_SUCCESS;
-        if(!HAL_STATUS_SUCCESS(status))
+        if(pSrcProfile->bssid != NULL)
         {
             smsLog( pMac, LOGE,
                 FL("failed to allocate memory for BSSID"
@@ -6818,16 +6811,7 @@ eHalStatus csrRoamCopyConnectedProfile(tpAniSirGlobal pMac, tANI_U32 sessionId, 
                 pSrcProfile->bssid[3], pSrcProfile->bssid[4], pSrcProfile->bssid[5]);
             break;
         }
-        pDstProfile->BSSIDs.numOfBSSIDs = 1;
-        vos_mem_copy(pDstProfile->BSSIDs.bssid, pSrcProfile->bssid,
-                     sizeof(tCsrBssid));
-
-        pDstProfile->SSIDs.SSIDList = vos_mem_malloc(sizeof(tCsrSSIDInfo));
-        if ( NULL == pDstProfile->SSIDs.SSIDList )
-            status = eHAL_STATUS_FAILURE;
-        else
-            status = eHAL_STATUS_SUCCESS;
-        if(!HAL_STATUS_SUCCESS(status))
+        if(pSrcProfile->SSID.ssId != NULL)
         {
             smsLog( pMac, LOGE,
              FL("failed to allocate memory for SSIDList"

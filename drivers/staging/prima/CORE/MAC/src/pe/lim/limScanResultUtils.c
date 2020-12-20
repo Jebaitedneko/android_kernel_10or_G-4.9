@@ -429,7 +429,8 @@ limCheckAndAddBssDescription(tpAniSirGlobal pMac,
            ( pMac->lim.gLimReturnAfterFirstMatch & 0x01 ) &&
            (pMac->lim.gpLimMlmScanReq->numSsid) &&
            !limIsScanRequestedSSID(pMac, &pBPR->ssId)) ||
-          (!fFound && pMac->lim.gpLimMlmScanReq &&
+          (!fFound && (pMac->lim.gpLimMlmScanReq &&
+                       pMac->lim.gpLimMlmScanReq->bssId != NULL) &&
            !vos_mem_compare(bssid,
                            &pMac->lim.gpLimMlmScanReq->bssId, 6))))
     {

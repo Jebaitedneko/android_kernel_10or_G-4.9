@@ -337,11 +337,11 @@ static void bslWriteFinish(struct work_struct *work);
 static int BSL_Open (struct hci_dev *hdev);
 static int BSL_Close (struct hci_dev *hdev);
 static int BSL_Flush(struct hci_dev *hdev);
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,13,0))
+static int BSL_Write(struct hci_dev *hdev, struct sk_buff *skb);
+#else
 static int BSL_IOControl(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
 static int BSL_Write(struct sk_buff *skb);
-#else
-static int BSL_Write(struct hci_dev *hdev, struct sk_buff *skb);
 #endif
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0))
 static void BSL_Destruct(struct hci_dev *hdev);
@@ -613,6 +613,7 @@ static VOS_STATUS WLANBAP_STARxCB
            break;
        }
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0))
        //JEZ100809: While an skb is being handled by the kernel, is "skb->dev" de-ref'd?
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0))
        skb->dev = (struct net_device *) gpBslctx->hdev;
@@ -625,10 +626,10 @@ static VOS_STATUS WLANBAP_STARxCB
        gpBslctx->rx_skb = skb;
 
        // This is how data and events are passed up to BlueZ
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0))
-       hci_recv_frame(gpBslctx->rx_skb);
-#else
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,13,0))
        hci_recv_frame(gpBslctx->hdev, gpBslctx->rx_skb);
+#else
+       hci_recv_frame(gpBslctx->rx_skb);
 #endif
 
        // now process the next packet in the chain
@@ -1495,6 +1496,7 @@ static VOS_STATUS WLANBAP_EventCB
     VosStatus = vos_pkt_return_packet( pVosPkt );
     VOS_ASSERT(VOS_IS_STATUS_SUCCESS( VosStatus ));
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0))
     //JEZ100809: While an skb is being handled by the kernel, is "skb->dev" de-ref'd?
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0))
     skb->dev = (struct net_device *) gpBslctx->hdev;
@@ -1507,10 +1509,10 @@ static VOS_STATUS WLANBAP_EventCB
     gpBslctx->rx_skb = skb;
 
     // This is how data and events are passed up to BlueZ
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0))
-    hci_recv_frame(gpBslctx->rx_skb);
-#else
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,13,0))
     hci_recv_frame(gpBslctx->hdev, gpBslctx->rx_skb);
+#else
+    hci_recv_frame(gpBslctx->rx_skb);
 #endif
 
     return(VOS_STATUS_SUCCESS);
@@ -4081,10 +4083,10 @@ static void BSL_Destruct(struct hci_dev *hdev)
 */
 //static ssize_t BSL_Write(struct file *pFile, const char __user *pBuffer,
 //                         size_t Count, loff_t *pOff)
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0))
-static int BSL_Write(struct sk_buff *skb)
-#else
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,13,0))
 static int BSL_Write(struct hci_dev *hdev, struct sk_buff *skb)
+#else
+static int BSL_Write(struct sk_buff *skb)
 #endif
 {
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0))
