@@ -21,8 +21,8 @@
  *    all wakeups are TASK_NORMAL in order to avoid O(n) lookups for the right
  *    sleeper state.
  *
- *  - the !exclusive mode; because that leads to O(n) wakeups, everything is
- *    exclusive.
+ *  - the exclusive mode; because this requires preserving the list order
+ *    and this is hard.
  *
  *  - custom wake functions; because you cannot give any guarantees about
  *    random code.
@@ -88,16 +88,16 @@ extern void swake_up(struct swait_queue_head *q);
 extern void swake_up_all(struct swait_queue_head *q);
 extern void swake_up_locked(struct swait_queue_head *q);
 
+extern void __prepare_to_swait(struct swait_queue_head *q, struct swait_queue *wait);
 extern void prepare_to_swait(struct swait_queue_head *q, struct swait_queue *wait, int state);
 extern long prepare_to_swait_event(struct swait_queue_head *q, struct swait_queue *wait, int state);
 
 extern void __finish_swait(struct swait_queue_head *q, struct swait_queue *wait);
 extern void finish_swait(struct swait_queue_head *q, struct swait_queue *wait);
 
-/* as per ___wait_event() but for swait, therefore "exclusive == 1" */
+/* as per ___wait_event() but for swait, therefore "exclusive == 0" */
 #define ___swait_event(wq, condition, state, ret, cmd)			\
 ({									\
-	__label__ __out;						\
 	struct swait_queue __wait;					\
 	long __ret = ret;						\
 									\
@@ -110,13 +110,13 @@ extern void finish_swait(struct swait_queue_head *q, struct swait_queue *wait);
 									\
 		if (___wait_is_interruptible(state) && __int) {		\
 			__ret = __int;					\
-			goto __out;					\
+			break;						\
 		}							\
 									\
 		cmd;							\
 	}								\
 	finish_swait(&wq, &__wait);					\
-__out:	__ret;								\
+	__ret;								\
 })
 
 #define __swait_event(wq, condition)					\
@@ -166,61 +166,6 @@ do {									\
 	if (!___wait_cond_timeout(condition))				\
 		__ret = __swait_event_interruptible_timeout(wq,		\
 						condition, timeout);	\
-	__ret;								\
-})
-
-#define __swait_event_idle(wq, condition)				\
-	(void)___swait_event(wq, condition, TASK_IDLE, 0, schedule())
-
-/**
- * swait_event_idle - wait without system load contribution
- * @wq: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
- *
- * The process is put to sleep (TASK_IDLE) until the @condition evaluates to
- * true. The @condition is checked each time the waitqueue @wq is woken up.
- *
- * This function is mostly used when a kthread or workqueue waits for some
- * condition and doesn't want to contribute to system load. Signals are
- * ignored.
- */
-#define swait_event_idle(wq, condition)					\
-do {									\
-	if (condition)							\
-		break;							\
-	__swait_event_idle(wq, condition);				\
-} while (0)
-
-#define __swait_event_idle_timeout(wq, condition, timeout)		\
-	___swait_event(wq, ___wait_cond_timeout(condition),		\
-		       TASK_IDLE, timeout,				\
-		       __ret = schedule_timeout(__ret))
-
-/**
- * swait_event_idle_timeout - wait up to timeout without load contribution
- * @wq: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
- * @timeout: timeout at which we'll give up in jiffies
- *
- * The process is put to sleep (TASK_IDLE) until the @condition evaluates to
- * true. The @condition is checked each time the waitqueue @wq is woken up.
- *
- * This function is mostly used when a kthread or workqueue waits for some
- * condition and doesn't want to contribute to system load. Signals are
- * ignored.
- *
- * Returns:
- * 0 if the @condition evaluated to %false after the @timeout elapsed,
- * 1 if the @condition evaluated to %true after the @timeout elapsed,
- * or the remaining jiffies (at least 1) if the @condition evaluated
- * to %true before the @timeout elapsed.
- */
-#define swait_event_idle_timeout(wq, condition, timeout)		\
-({									\
-	long __ret = timeout;						\
-	if (!___wait_cond_timeout(condition))				\
-		__ret = __swait_event_idle_timeout(wq,			\
-						   condition, timeout);	\
 	__ret;								\
 })
 

@@ -777,6 +777,7 @@ void do_exit(long code)
 {
 	struct task_struct *tsk = current;
 	int group_dead;
+	TASKS_RCU(int tasks_rcu_i);
 
 	/*
 	 * We can get here from a kernel oops, sometimes with preemption off.
@@ -906,7 +907,9 @@ void do_exit(long code)
 	 */
 	flush_ptrace_hw_breakpoint(tsk);
 
-	exit_tasks_rcu_start();
+	TASKS_RCU(preempt_disable());
+	TASKS_RCU(tasks_rcu_i = __srcu_read_lock(&tasks_rcu_exit_srcu));
+	TASKS_RCU(preempt_enable());
 	exit_notify(tsk, group_dead);
 	proc_exit_connector(tsk);
 	mpol_put_task_policy(tsk);
@@ -941,7 +944,7 @@ void do_exit(long code)
 	if (tsk->nr_dirtied)
 		__this_cpu_add(dirty_throttle_leaks, tsk->nr_dirtied);
 	exit_rcu();
-	exit_tasks_rcu_finish();
+	TASKS_RCU(__srcu_read_unlock(&tasks_rcu_exit_srcu, tasks_rcu_i));
 
 	do_task_dead();
 }
