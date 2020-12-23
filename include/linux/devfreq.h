@@ -59,8 +59,6 @@ struct devfreq_dev_status {
  */
 #define DEVFREQ_FLAG_LEAST_UPPER_BOUND		0x1
 
-#define DEVFREQ_FLAG_WAKEUP_MAXFREQ		0x2
-
 /**
  * struct devfreq_dev_profile - Devfreq's user device profile
  * @initial_freq:	The operating frequency when devfreq_add_device() is
@@ -126,8 +124,7 @@ struct devfreq_governor {
 
 	const char name[DEVFREQ_NAME_LEN];
 	const unsigned int immutable;
-	int (*get_target_freq)(struct devfreq *this, unsigned long *freq,
-				u32 *flag);
+	int (*get_target_freq)(struct devfreq *this, unsigned long *freq);
 	int (*event_handler)(struct devfreq *devfreq,
 				unsigned int event, void *data);
 };
