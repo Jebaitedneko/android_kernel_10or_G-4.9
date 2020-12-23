@@ -184,17 +184,26 @@
 
 &apc_cpr {
 
-// 	/* Turbo (corner 6) ceiling voltage */
-// 	qcom,cpr-aging-ref-voltage = <900000>;
 	/delete-property/ qcom,cpr-aging-ref-voltage;
+	/delete-property/ qcom,cpr-aging-allowed-reg-mask;
+	/delete-property/ qcom,cpr-aging-allowed-reg-value;
+	/delete-property/ qcom,apm-hysteresis-voltage;
+	qcom,apm-threshold-voltage = <0>;
 };
 
 &apc_vreg {
 
+	/delete-property/ qcom,cpr-open-loop-voltage-fuse-adjustment;
+	/delete-property/ qcom,cpr-open-loop-voltage-adjustment;
+	/delete-property/ qcom,cpr-open-loop-voltage-min-diff;
+	/delete-property/ qcom,cpr-scaled-open-loop-voltage-as-ceiling;
+	/delete-property/ qcom,cpr-aging-derate;
 	/delete-property/ qcom,cpr-aging-max-voltage-adjustment;
 	/delete-property/ qcom,cpr-aging-ref-corner;
 	/delete-property/ qcom,cpr-aging-ro-scaling-factor;
 	/delete-property/ qcom,allow-aging-voltage-adjustment;
+	/delete-property/ qcom,allow-voltage-interpolation;
+	/delete-property/ qcom,allow-quotient-interpolation;
 
 	regulator-max-microvolt = <10>;
 
@@ -333,22 +342,22 @@
 		300000 300000>,
 
 	/* Speed bin 7; CPR rev 0..7 */
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>;
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>;
 
 	qcom,cpr-misc-fuse-voltage-adjustment =
 		/* Speed bin 0; misc fuse 0..1 */
@@ -417,87 +426,6 @@
 		2393600000
 		2666600000
 		>;
-
-	qcom,cpr-open-loop-voltage-fuse-adjustment =
-		/* Speed bin 0; CPR rev 0..7 */
-		<     0      0      0     0>,
-		< 25000      0   5000 40000>,
-		< 25000      0   5000 40000>,
-		< 25000      0   5000 40000>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 1; CPR rev 0..7 */
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 2; CPR rev 0..7 */
-		<     0      0      0     0>,
-		< 25000      0   5000 40000>,
-		< 25000      0   5000 40000>,
-		< 25000      0   5000 40000>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 3; CPR rev 0..7 */
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 4; CPR rev 0..7 */
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 5; CPR rev 0..7 */
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 6; CPR rev 0..7 */
-		<     0      0      0     0>,
-		< 25000      0   5000 40000>,
-		< 25000      0   5000 40000>,
-		< 25000      0   5000 40000>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 7; CPR rev 0..7 */
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>;
 
 	qcom,cpr-closed-loop-voltage-fuse-adjustment =
 		/* Speed bin 0; CPR rev 0..7 */
