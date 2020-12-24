@@ -17,19 +17,19 @@
 
 		CPU0: cpu@0 {
 			clock-frequency = <2666600000>;
-			efficiency = <4096>; // 1024
+			efficiency = <1126>; // 1024
 		};
 		CPU1: cpu@1 {
 			clock-frequency = <2666600000>;
-			efficiency = <4096>; // 1024
+			efficiency = <1126>; // 1024
 		};
 		CPU2: cpu@2 {
 			clock-frequency = <2666600000>;
-			efficiency = <4096>; // 1024
+			efficiency = <1126>; // 1024
 		};
 		CPU3: cpu@3 {
 			clock-frequency = <2666600000>;
-			efficiency = <4096>; // 1024
+			efficiency = <1126>; // 1024
 		};
 		CPU4: cpu@100 {
 			clock-frequency = <2666600000>;
