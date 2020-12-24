@@ -17,27 +17,35 @@
 
 		CPU0: cpu@0 {
 			clock-frequency = <2666600000>;
+			efficiency = <1126>; // 1024
 		};
 		CPU1: cpu@1 {
 			clock-frequency = <2666600000>;
+			efficiency = <1126>; // 1024
 		};
 		CPU2: cpu@2 {
 			clock-frequency = <2666600000>;
+			efficiency = <1126>; // 1024
 		};
 		CPU3: cpu@3 {
 			clock-frequency = <2666600000>;
+			efficiency = <1126>; // 1024
 		};
 		CPU4: cpu@100 {
 			clock-frequency = <2666600000>;
+			efficiency = <1024>; // 1126
 		};
 		CPU5: cpu@101 {
 			clock-frequency = <2666600000>;
+			efficiency = <1024>; // 1126
 		};
 		CPU6: cpu@102 {
 			clock-frequency = <2666600000>;
+			efficiency = <1024>; // 1126
 		};
 		CPU7: cpu@103 {
 			clock-frequency = <2666600000>;
+			efficiency = <1024>; // 1126
 		};
 	};
 };
@@ -184,17 +192,26 @@
 
 &apc_cpr {
 
-// 	/* Turbo (corner 6) ceiling voltage */
-// 	qcom,cpr-aging-ref-voltage = <900000>;
 	/delete-property/ qcom,cpr-aging-ref-voltage;
+	/delete-property/ qcom,cpr-aging-allowed-reg-mask;
+	/delete-property/ qcom,cpr-aging-allowed-reg-value;
+	/delete-property/ qcom,apm-hysteresis-voltage;
+	qcom,apm-threshold-voltage = <0>;
 };
 
 &apc_vreg {
 
+	/delete-property/ qcom,cpr-open-loop-voltage-fuse-adjustment;
+	/delete-property/ qcom,cpr-open-loop-voltage-adjustment;
+	/delete-property/ qcom,cpr-open-loop-voltage-min-diff;
+	/delete-property/ qcom,cpr-scaled-open-loop-voltage-as-ceiling;
+	/delete-property/ qcom,cpr-aging-derate;
 	/delete-property/ qcom,cpr-aging-max-voltage-adjustment;
 	/delete-property/ qcom,cpr-aging-ref-corner;
 	/delete-property/ qcom,cpr-aging-ro-scaling-factor;
 	/delete-property/ qcom,allow-aging-voltage-adjustment;
+	/delete-property/ qcom,allow-voltage-interpolation;
+	/delete-property/ qcom,allow-quotient-interpolation;
 
 	regulator-max-microvolt = <10>;
 
@@ -333,22 +350,22 @@
 		300000 300000>,
 
 	/* Speed bin 7; CPR rev 0..7 */
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>,
-		<0 0 0 0 0
-		0 0 0 0 0>;
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>,
+		<(-1) (-1) (-1) (-1) (-1)
+		(-1) (-1) (-1) (-1) (-1)>;
 
 	qcom,cpr-misc-fuse-voltage-adjustment =
 		/* Speed bin 0; misc fuse 0..1 */
@@ -417,87 +434,6 @@
 		2393600000
 		2666600000
 		>;
-
-	qcom,cpr-open-loop-voltage-fuse-adjustment =
-		/* Speed bin 0; CPR rev 0..7 */
-		<     0      0      0     0>,
-		< 25000      0   5000 40000>,
-		< 25000      0   5000 40000>,
-		< 25000      0   5000 40000>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 1; CPR rev 0..7 */
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 2; CPR rev 0..7 */
-		<     0      0      0     0>,
-		< 25000      0   5000 40000>,
-		< 25000      0   5000 40000>,
-		< 25000      0   5000 40000>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 3; CPR rev 0..7 */
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 4; CPR rev 0..7 */
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 5; CPR rev 0..7 */
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 6; CPR rev 0..7 */
-		<     0      0      0     0>,
-		< 25000      0   5000 40000>,
-		< 25000      0   5000 40000>,
-		< 25000      0   5000 40000>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-
-		/* Speed bin 7; CPR rev 0..7 */
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>,
-		<     0      0      0     0>;
 
 	qcom,cpr-closed-loop-voltage-fuse-adjustment =
 		/* Speed bin 0; CPR rev 0..7 */
@@ -603,31 +539,16 @@
 
 		busy-cost-data = <
 			435200    2
-			652800    5
-			870400    7
-			883200    8
-			1036800   10
-			1248000   13
-			1305600   15
+			652800    6
+			870400    8
+			1305600   14
 			1401600   16
-			1523200   80
-			1536000   85
-			1689600   95
-			1740800  100
-			1804800  105
-			1843200  115
-			1958400  125
-			2016000  135
-			2150400  145
-			2176000  150
-			2208000  155
-			2304000  165
-			2393600  170
-			2400000  175
-			2666600  180
-			2828800  220
-			3046400  240
-			3264000  260
+			1523200   20
+			1740800   24
+			1958400   28
+			2176000   48
+			2393600   56
+			2666600   68
 		>;
 		idle-cost-data = <
 			4 3 2 1
@@ -637,32 +558,17 @@
 	CLUSTER_COST_0: cluster-cost0 {
 
 		busy-cost-data = <
-			435200    66
-			652800    69
-			870400    70
-			883200    72
-			1036800   74
-			1248000   77
-			1305600   80
-			1401600   80
-			1523200   85
-			1536000   90
-			1689600  100
-			1740800  105
-			1804800  110
-			1843200  120
-			1958400  130
-			2016000  140
-			2150400  150
-			2176000  155
-			2208000  160
-			2304000  170
-			2393600  175
-			2400000  180
-			2666600  185
-			2828800  220
-			3046400  240
-			3264000  260
+			435200    32
+			652800    68
+			870400    76
+			1305600   82
+			1401600   84
+			1523200   92
+			1740800  104
+			1958400  128
+			2176000  148
+			2393600  168
+			2666600  188
 		>;
 		idle-cost-data = <
 			4 3 2 1
@@ -673,31 +579,16 @@
 
 		busy-cost-data = <
 			435200    2
-			652800    5
-			870400    7
-			883200    8
-			1036800   10
-			1248000   13
-			1305600   15
+			652800    6
+			870400    8
+			1305600   14
 			1401600   16
-			1523200   80
-			1536000   85
-			1689600   95
-			1740800  100
-			1804800  105
-			1843200  115
-			1958400  125
-			2016000  135
-			2150400  145
-			2176000  150
-			2208000  155
-			2304000  165
-			2393600  170
-			2400000  175
-			2666600  180
-			2828800  220
-			3046400  240
-			3264000  260
+			1523200   82
+			1740800   92
+			1958400  124
+			2176000  146
+			2393600  168
+			2666600  198
 		>;
 		idle-cost-data = <
 			4 3 2 1
