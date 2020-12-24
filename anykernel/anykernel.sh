@@ -36,5 +36,6 @@ ui_print "Brought to you by MOCHI (TG: @mochi_wwww)"
 ui_print "*******************************************"
 
 patch_cmdline firmware_class.path firmware_class.path=/vendor/firmware_mnt/image
+patch_cmdline lpm_levels.sleep_disabled lpm_levels.sleep_disabled=0
 
 write_boot;
