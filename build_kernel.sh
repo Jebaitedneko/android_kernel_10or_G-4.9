@@ -4,26 +4,23 @@
 
 source anykernel/build_helper.sh
 
-[[ $3 == 'e'                ]] && holland1
-[[ $3 == 'm'                ]] && mido
+[[ $2 == 'f' ]] && full_lto
+[[ $2 == 't' ]] && thin_lto
 
-[[ $1 == 'n' || $1 == 'dn'  ]] && nontreble
-[[ $2 == 's'                ]] && noslmk
-[[ $2 == 'flto'             ]] && full_lto
-[[ $2 == 'tlto'             ]] && thin_lto
+[[ $1 == 'g'    ]] && export model=HOLLAND2
+[[ $1 == 'e'    ]] && holland1 && export model=HOLLAND2
+[[ $1 == 'm'    ]] && mido && export model=MIDO
 
 BUILD_START=$(date +"%s")
+
 make O=out ARCH=arm64 final_defconfig
 
-[[ $1 == 'n' || $1 == 't'   ]] && pcmake -j$(nproc --all)
+[[ $2 != 'dtb' ]] && pcmake -j$(nproc --all) || pcmake dtbs
 
-BUILD_END=$(date +"%s")
-DIFF=$(($BUILD_END - $BUILD_START))
+DIFF=$(($(date +"%s") - $BUILD_START))
 echo -e "\nBuild completed in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds."
 
-[[ $1 == 'dt' || $1 == 'dn' ]] && pcmake dtbs
-[[ $1 == 'n'                ]] && pcmod
+[[ $2 != 'dtb' ]] && ./anykernel/build_zip.sh $1
 
-[[ $1 == 'n' || $1 == 't'   ]] && ./anykernel/build_zip.sh $1
-
+unset model
 rm arch/arm64/configs/final_defconfig

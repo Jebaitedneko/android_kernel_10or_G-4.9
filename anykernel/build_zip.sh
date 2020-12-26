@@ -5,7 +5,7 @@ ak_dir=anykernel/anykernel3
 pronto_dir=anykernel/pronto_wlan
 image=$kernel_dir/out/arch/arm64/boot/Image.gz-dtb
 pre=` cat $kernel_dir/out/.config | grep Linux | cut -f 3 -d " "  `
-fmt=`date +%d\.%m\.%Y_%H\:%M\:%S`
+fmt=`date +%d\.%m\.%y_%r | sed 's/:/./g;s/ PM/.PM/g;s/ AM/.AM/g'`
 
 [ -d $ak_dir ] && echo -e "\nAnykernel 3 Present.\n" \
 || mkdir -p $ak_dir \
@@ -17,29 +17,7 @@ cp -r $ak_dir ./ak_dir_working
 cp $image ./Image.gz-dtb
 mv Image.gz-dtb ./ak_dir_working && cd ak_dir_working
 
-treble() {
-zip -r ${pre}_MOCHI_${fmt}.zip . -x '*.git*' '*modules*' '*patch*' '*ramdisk*' 'LICENSE' 'README.md'
+zip -r ${pre}_MOCHI_${model}_${fmt}.zip . -x '*.git*' '*modules*' '*patch*' '*ramdisk*' 'LICENSE' 'README.md'
 mv *.zip ../out
 cd ..
 rm -rf ak_dir_working
-}
-
-nontreble() {
-sed -i '/patch_cmdline firmware/d' anykernel.sh
-
-zip -r ${pre}_BOOT_MOCHI_NON_TREBLE_${fmt}.zip . -x '*.git*' '*modules*' '*patch*' '*ramdisk*' 'LICENSE' 'README.md'
-mv *.zip ../out
-cd ..
-rm -rf ak_dir_working
-
-unzip $ak_dir/../pronto_wlan_template.zip -d $pronto_dir
-cd $kernel_dir/modules
-find -iname "wlan.ko" -exec cp {} ../$pronto_dir/vendor/lib/modules/wlan.ko \;
-
-cd ../$pronto_dir
-zip -r ${pre}_PRONTO_WLAN_NON_TREBLE_${fmt}.zip . -x '*.git*' '*modules*' '*patch*' '*ramdisk*' 'LICENSE' 'README.md'
-mv *.zip ../../out
-cd ../../ && rm -rf $pronto_dir
-}
-
-[[ $1 == 't' ]] && treble || nontreble
