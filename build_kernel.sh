@@ -8,7 +8,7 @@ source anykernel/build_helper.sh
 [[ $2 == 't' ]] && thin_lto
 
 [[ $1 == 'g'    ]] && export model=HOLLAND2
-[[ $1 == 'e'    ]] && holland1 && export model=HOLLAND2
+[[ $1 == 'e'    ]] && holland1 && export model=HOLLAND1
 [[ $1 == 'm'    ]] && mido && export model=MIDO
 
 BUILD_START=$(date +"%s")
