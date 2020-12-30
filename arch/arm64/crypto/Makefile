@@ -41,5 +41,15 @@ obj-$(CONFIG_CRYPTO_CRC32_ARM64) += crc32-arm64.o
 
 CFLAGS_crc32-arm64.o	:= -mcpu=generic+crc
 
+ifeq ($(CONFIG_ARCH_MSM8953), y)
+EXTRA_CFLAGS += -O3 -mcpu=cortex-a53+crypto+crc -Wa,-mcpu=cortex-a53+crypto+crc -mtune=cortex-a53
+EXTRA_AFLAGS += -O3 -mcpu=cortex-a53+crypto+crc -Wa,-mcpu=cortex-a53+crypto+crc -mtune=cortex-a53
+else
+ifeq ($(CONFIG_ARCH_MSM8937), y)
+EXTRA_CFLAGS += -O3 -mcpu=cortex-a53+crypto+crc -Wa,-mcpu=cortex-a53+crypto+crc -mtune=cortex-a53
+EXTRA_AFLAGS += -O3 -mcpu=cortex-a53+crypto+crc -Wa,-mcpu=cortex-a53+crypto+crc -mtune=cortex-a53
+endif
+endif
+
 $(obj)/aes-glue-%.o: $(src)/aes-glue.c FORCE
 	$(call if_changed_rule,cc_o_c)
