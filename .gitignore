@@ -9,6 +9,10 @@
 #
 # Normal rules
 #
+arch/arm64/configs/final_defconfig
+out/
+anykernel/anykernel3/
+anykernel/pronto_wlan/
 .*
 *.o
 *.o.*
