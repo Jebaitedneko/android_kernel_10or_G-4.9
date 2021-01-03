@@ -179,3 +179,82 @@
 		status = "disabled";
 	};
 };
+
+&soc {
+
+	qcom,lpm-levels {
+
+		qcom,pm-cluster@0 {
+
+			qcom,disable-prediction;
+			qcom,disable-ipi-prediction;
+
+			qcom,pm-cluster-level@0 {
+				qcom,disable-prediction;
+				qcom,disable-ipi-prediction;
+			};
+
+			qcom,pm-cluster-level@1 {
+				qcom,disable-prediction;
+				qcom,disable-ipi-prediction;
+			};
+
+			qcom,pm-cluster-level@2 {
+				qcom,disable-prediction;
+				qcom,disable-ipi-prediction;
+			};
+
+			qcom,pm-cluster@0 {
+
+				qcom,disable-prediction;
+				qcom,disable-ipi-prediction;
+
+				qcom,pm-cluster-level@0 {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+
+				qcom,pm-cluster-level@1 {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+
+				qcom,pm-cluster-level@2 {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+
+				qcom,pm-cpu {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+			};
+
+			qcom,pm-cluster@1 {
+
+				qcom,disable-prediction;
+				qcom,disable-ipi-prediction;
+
+				qcom,pm-cluster-level@0 {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+
+				qcom,pm-cluster-level@1 {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+
+				qcom,pm-cluster-level@2 {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+
+				qcom,pm-cpu {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+			};
+		};
+	};
+};
