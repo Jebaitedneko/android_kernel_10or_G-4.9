@@ -248,4 +248,9 @@
 	};
 
 	/delete-node/ qseecom@85b00000;
+
+	qcom,wcnss-wlan@0a000000 {
+
+		qcom,is-pronto-vadc;
+	};
 };
