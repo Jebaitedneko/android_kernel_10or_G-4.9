@@ -11,51 +11,46 @@
 * GNU General Public License for more details.
 */
 
-/ {
-
-	cpus {
-
-		CPU0: cpu@0 {
-			clock-frequency = <2828800000>;
-			efficiency = <1126>; // 1024
-		};
-		CPU1: cpu@1 {
-			clock-frequency = <2828800000>;
-			efficiency = <1126>; // 1024
-		};
-		CPU2: cpu@2 {
-			clock-frequency = <2828800000>;
-			efficiency = <1126>; // 1024
-		};
-		CPU3: cpu@3 {
-			clock-frequency = <2828800000>;
-			efficiency = <1126>; // 1024
-		};
-		CPU4: cpu@100 {
-			clock-frequency = <2828800000>;
-			efficiency = <1024>; // 1126
-		};
-		CPU5: cpu@101 {
-			clock-frequency = <2828800000>;
-			efficiency = <1024>; // 1126
-		};
-		CPU6: cpu@102 {
-			clock-frequency = <2828800000>;
-			efficiency = <1024>; // 1126
-		};
-		CPU7: cpu@103 {
-			clock-frequency = <2828800000>;
-			efficiency = <1024>; // 1126
-		};
-	};
+&CPU0 {
+	clock-frequency = <2828800000>;
+	efficiency = <820>; // 1024
+};
+&CPU1 {
+	clock-frequency = <2828800000>;
+	efficiency = <820>; // 1024
+};
+&CPU2 {
+	clock-frequency = <2828800000>;
+	efficiency = <820>; // 1024
+};
+&CPU3{
+	clock-frequency = <2828800000>;
+	efficiency = <820>; // 1024
+};
+&CPU4 {
+	clock-frequency = <2828800000>;
+	efficiency = <1126>; // 1126
+};
+&CPU5 {
+	clock-frequency = <2828800000>;
+	efficiency = <1126>; // 1126
+};
+&CPU6 {
+	clock-frequency = <2828800000>;
+	efficiency = <1126>; // 1126
+};
+&CPU7{
+	clock-frequency = <2828800000>;
+	efficiency = <1126>; // 1126
 };
 
 &msm_cpufreq {
 
-	clock-names = "l2_clk", "cpu0_clk", "cpu1_clk", "cpu2_clk",
-			"cpu3_clk", "cpu4_clk", "cpu5_clk",
-			"cpu6_clk", "cpu7_clk", "cpu8_clk",
-			"cpu9_clk", "cpu10_clk";
+	clock-names = "l2_clk", "cpu0_clk", "cpu1_clk",
+				"cpu2_clk", "cpu3_clk", "cpu4_clk",
+				"cpu5_clk", "cpu6_clk", "cpu7_clk",
+				"cpu8_clk", "cpu9_clk", "cpu10_clk";
+
 	clocks = <&clock_cpu clk_cci_clk>,
 			<&clock_cpu clk_a53_pwr_clk>,
 			<&clock_cpu clk_a53_pwr_clk>,
@@ -554,84 +549,72 @@
 		<      0        0        0      0>;
 };
 
-&spmi_bus {
-	qcom,pm8953@1 {
-
-		/* PM8953 S5 + S6 = VDD_APC supply */
-		pm8953_s5: spm-regulator@2000 {
-			regulator-min-microvolt = <350000>; /* Default 400000 */
-			regulator-max-microvolt = <900000>; /* Default 1140000 */
-
-			pm8953_s5_limit: avs-limit-regulator {
-				regulator-min-microvolt = <350000>; /* Default 400000 */
-				regulator-max-microvolt = <900000>; /* Default 1140000 */
-			};
-		};
-	};
+&pm8953_s5 {
+	regulator-min-microvolt = <350000>; /* Default 400000 */
+	regulator-max-microvolt = <900000>; /* Default 1140000 */
 };
 
-&energy_costs {
+&pm8953_s5_limit {
+	regulator-min-microvolt = <350000>; /* Default 400000 */
+	regulator-max-microvolt = <900000>; /* Default 1140000 */
+};
 
-	CPU_COST_0: core-cost0 {
+&CPU_COST_0 {
+	busy-cost-data = <
+		435200    4
+		652800    6
+		870400    8
+		1088000   10
+		1305600   15
+		1523200   20
+		1740800   24
+		1958400   36
+		2176000   48
+		2393600   55
+		2611200   65
+		2828800   75
+	>;
+	idle-cost-data = <
+		4 3 2 1
+	>;
+};
 
-		busy-cost-data = <
-			435200    4
-			652800    6
-			870400    8
-			1088000   10
-			1305600   15
-			1523200   20
-			1740800   24
-			1958400   36
-			2176000   48
-			2393600   55
-			2611200   65
-			2828800   75
-		>;
-		idle-cost-data = <
-			4 3 2 1
-		>;
-	};
+&CLUSTER_COST_0 {
+	busy-cost-data = <
+		435200    32
+		652800    54
+		870400    76
+		1088000   83
+		1305600   95
+		1523200  107
+		1740800  114
+		1958400  126
+		2176000  138
+		2393600  152
+		2611200  174
+		2828800  196
+	>;
+	idle-cost-data = <
+		4 3 2 1
+	>;
+};
 
-	CLUSTER_COST_0: cluster-cost0 {
-
-		busy-cost-data = <
-			435200    32
-			652800    54
-			870400    76
-			1088000   83
-			1305600   95
-			1523200  107
-			1740800  114
-			1958400  126
-			2176000  138
-			2393600  152
-			2611200  174
-			2828800  196
-		>;
-		idle-cost-data = <
-			4 3 2 1
-		>;
-	};
-
-	CLUSTER_COST_1: cluster-cost1 {
-
-		busy-cost-data = <
-			435200    4
-			652800    6
-			870400    8
-			1088000   10
-			1305600   15
-			1523200   20
-			1740800   92
-			1958400  102
-			2176000  112
-			2393600  151
-			2611200  173
-			2828800  195
-		>;
-		idle-cost-data = <
-			4 3 2 1
-		>;
-	};
+&CLUSTER_COST_1 {
+	busy-cost-data = <
+		435200    4
+		652800    6
+		870400    8
+		1088000   10
+		1305600   15
+		1523200   20
+		1740800   92
+		1958400  102
+		2176000  112
+		2393600  151
+		2611200  173
+		2828800  195
+	>;
+	idle-cost-data = <
+		4 3 2 1
+	>;
 };
