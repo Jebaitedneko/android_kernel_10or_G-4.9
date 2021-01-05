@@ -184,6 +184,8 @@
 
 	qcom,lpm-levels {
 
+		qcom,use-psci;
+
 		qcom,pm-cluster@0 {
 
 			qcom,disable-prediction;
