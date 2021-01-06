@@ -37,6 +37,9 @@
 #include <linux/spinlock.h>
 #include <linux/uaccess.h>
 #include <linux/syslog.h>
+#ifdef CONFIG_PSTORE_LAST_KMSG
+#include <linux/proc_fs.h>
+#endif
 
 #include "internal.h"
 
@@ -292,6 +295,24 @@ bool pstore_is_mounted(void)
 	return pstore_sb != NULL;
 }
 
+#ifdef CONFIG_PSTORE_LAST_KMSG
+static char *console_buffer;
+static ssize_t console_bufsize;
+
+static ssize_t last_kmsg_read(struct file *file, char __user *buf,
+			      size_t len, loff_t *offset)
+{
+	return simple_read_from_buffer(buf, len, offset,
+				       console_buffer, console_bufsize);
+}
+
+static const struct file_operations last_kmsg_fops = {
+	.owner          = THIS_MODULE,
+	.read           = last_kmsg_read,
+	.llseek         = default_llseek,
+};
+#endif
+
 /*
  * Make a regular file in the root directory of our file system.
  * Load it up with "size" bytes of data from "buf".
@@ -343,6 +364,10 @@ int pstore_mkfile(enum pstore_type_id type, char *psname, u64 id, int count,
 		break;
 	case PSTORE_TYPE_CONSOLE:
 		scnprintf(name, sizeof(name), "console-%s-%lld", psname, id);
+#ifdef CONFIG_PSTORE_LAST_KMSG
+		console_buffer = private->data;
+		console_bufsize = sizeof *private + size;
+#endif
 		break;
 	case PSTORE_TYPE_FTRACE:
 		scnprintf(name, sizeof(name), "ftrace-%s-%lld", psname, id);
@@ -466,14 +491,29 @@ static int __init init_pstore_fs(void)
 {
 	int err;
 
+#ifdef CONFIG_PSTORE_LAST_KMSG
+	struct proc_dir_entry *last_kmsg_entry = NULL;
+#endif
+
 	/* Create a convenient mount point for people to access pstore */
 	err = sysfs_create_mount_point(fs_kobj, "pstore");
 	if (err)
 		goto out;
 
 	err = register_filesystem(&pstore_fs_type);
-	if (err < 0)
+	if (err < 0) {
 		sysfs_remove_mount_point(fs_kobj, "pstore");
+		goto out;
+	}
+
+#ifdef CONFIG_PSTORE_LAST_KMSG
+	last_kmsg_entry = proc_create_data("last_kmsg", S_IFREG | S_IRUGO,
+					   NULL, &last_kmsg_fops, NULL);
+	if (!last_kmsg_entry) {
+		pr_err("Failed to create last_kmsg\n");
+		goto out;
+	}
+#endif
 
 out:
 	return err;
