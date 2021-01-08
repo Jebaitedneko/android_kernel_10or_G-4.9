@@ -1389,8 +1389,6 @@ retry:
 	else
 		expires_next = ktime_add(now, delta);
 	tick_program_event(expires_next, 1);
-	printk_once(KERN_WARNING "hrtimer: interrupt took %llu ns\n",
-		    ktime_to_ns(delta));
 }
 
 /*
