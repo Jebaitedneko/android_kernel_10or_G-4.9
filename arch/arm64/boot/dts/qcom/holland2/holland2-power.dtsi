@@ -100,9 +100,9 @@
 
 			qcom,float-voltage-mv = <4400>;
 			qcom,float-voltage-comp = <15>;
-			qcom,fastchg-current-ma = <2000>;
+			qcom,fastchg-current-ma = <3000>;
 			qcom,skip-usb-suspend-for-fake-battery;
-			qcom,thermal-mitigation = <2100 1800 1500 1200 900 600 300 0>;
+			qcom,thermal-mitigation = <3000 3000 3000 3000 3000 3000 3000 3000>;
 			qcom,float-voltage-mv-ntc = <4100>;
 			qcom,chg-led-sw-controls;
 			qcom,chg-led-support;
