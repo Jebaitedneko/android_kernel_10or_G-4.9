@@ -21,8 +21,6 @@
 #include <linux/wakeup_reason.h>
 #include <linux/cpuset.h>
 
-// #define DEBUG_LOG
-
 /*
  * Timeout for stopping processes
  */
@@ -89,38 +87,6 @@ static int try_to_freeze_tasks(bool user_only)
 			sleep_usecs *= 2;
 	}
 
-	end = ktime_get_boottime();
-	elapsed = ktime_sub(end, start);
-	elapsed_msecs = ktime_to_ms(elapsed);
-
-	if (wakeup) {
-		pr_cont("\n");
-		pr_err("Freezing of tasks aborted after %d.%03d seconds",
-		       elapsed_msecs / 1000, elapsed_msecs % 1000);
-	} else if (todo) {
-		pr_cont("\n");
-		pr_err("Freezing of tasks failed after %d.%03d seconds"
-		       " (%d tasks refusing to freeze, wq_busy=%d):\n",
-		       elapsed_msecs / 1000, elapsed_msecs % 1000,
-		       todo - wq_busy, wq_busy);
-
-		if (wq_busy)
-			show_workqueue_state();
-
-		read_lock(&tasklist_lock);
-		for_each_process_thread(g, p) {
-			if (p != current && !freezer_should_skip(p)
-			    && freezing(p) && !frozen(p))
-				sched_show_task(p);
-		}
-		read_unlock(&tasklist_lock);
-	} else {
-		#ifdef DEBUG_LOG
-		pr_cont("(elapsed %d.%03d seconds) ", elapsed_msecs / 1000,
-			elapsed_msecs % 1000);
-		#endif
-	}
-
 	return todo ? -EBUSY : 0;
 }
 
@@ -151,14 +117,8 @@ int freeze_processes(void)
 	error = try_to_freeze_tasks(true);
 	if (!error) {
 		__usermodehelper_set_disable_depth(UMH_DISABLED);
-	#ifdef DEBUG_LOG
-		pr_cont("done.");
-	#endif
 
 	}
-	#ifdef DEBUG_LOG
-	pr_cont("\n");
-	#endif
 	BUG_ON(in_atomic());
 
 	/*
@@ -191,12 +151,6 @@ int freeze_kernel_threads(void)
 
 	pm_nosig_freezing = true;
 	error = try_to_freeze_tasks(false);
-	#ifdef DEBUG_LOG
-	if (!error)
-		pr_cont("done.");
-
-	pr_cont("\n");
-	#endif
 	BUG_ON(in_atomic());
 
 	if (error)
@@ -238,9 +192,6 @@ void thaw_processes(void)
 	usermodehelper_enable();
 
 	schedule();
-	#ifdef DEBUG_LOG
-	pr_cont("done.\n");
-	#endif
 	trace_suspend_resume(TPS("thaw_processes"), 0, false);
 }
 
@@ -261,7 +212,4 @@ void thaw_kernel_threads(void)
 	read_unlock(&tasklist_lock);
 
 	schedule();
-	#ifdef DEBUG_LOG
-	pr_cont("done.\n");
-	#endif
 }
