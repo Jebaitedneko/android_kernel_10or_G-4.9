@@ -13,35 +13,35 @@
 
 &CPU0 {
 	clock-frequency = <2828800000>;
-	efficiency = <820>; // 1024
+	efficiency = <1024>; // 1024
 };
 &CPU1 {
 	clock-frequency = <2828800000>;
-	efficiency = <820>; // 1024
+	efficiency = <1024>; // 1024
 };
 &CPU2 {
 	clock-frequency = <2828800000>;
-	efficiency = <820>; // 1024
+	efficiency = <1024>; // 1024
 };
 &CPU3{
 	clock-frequency = <2828800000>;
-	efficiency = <820>; // 1024
+	efficiency = <1024>; // 1024
 };
 &CPU4 {
 	clock-frequency = <2828800000>;
-	efficiency = <1126>; // 1126
+	efficiency = <1228>; // 1126
 };
 &CPU5 {
 	clock-frequency = <2828800000>;
-	efficiency = <1126>; // 1126
+	efficiency = <1228>; // 1126
 };
 &CPU6 {
 	clock-frequency = <2828800000>;
-	efficiency = <1126>; // 1126
+	efficiency = <1228>; // 1126
 };
 &CPU7{
 	clock-frequency = <2828800000>;
-	efficiency = <1126>; // 1126
+	efficiency = <1228>; // 1126
 };
 
 &msm_cpufreq {
