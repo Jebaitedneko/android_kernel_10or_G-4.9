@@ -130,6 +130,7 @@
 			qcom,irq-volt-empty-mv = <3400>;
 			qcom,battery-data = <&qrd_batterydata>;
 			qcom,thermal-coefficients = [DA 86 F0 50 08 3C];
+			qcom,hold-soc-while-full;
 		};
 	};
 
