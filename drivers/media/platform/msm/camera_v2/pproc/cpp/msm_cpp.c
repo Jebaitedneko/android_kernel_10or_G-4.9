@@ -1629,6 +1629,10 @@ static int msm_cpp_buffer_ops(struct cpp_device *cpp_dev,
 			(struct msm_buf_mngr_info *)arg;
 		rc = cpp_dev->buf_mgr_ops.msm_cam_buf_mgr_ops(buff_mgr_ops,
 			buff_mgr_info);
+		if (rc < 0) {
+			rc = cpp_dev->buf_mgr_ops.msm_cam_buf_mgr_ops(
+				VIDIOC_MSM_BUF_MNGR_GET_BUF, buff_mgr_info);
+		}
 		break;
 	}
 	}
