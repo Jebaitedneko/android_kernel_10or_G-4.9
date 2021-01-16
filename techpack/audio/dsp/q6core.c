@@ -515,8 +515,6 @@ static int q6core_send_get_avcs_fwk_ver_cmd(void)
 		 * Pass in the negated value so adsp_err_get_err_str returns
 		 * the correct string.
 		 */
-		pr_err("%s: DSP returned error[%s]\n", __func__,
-		       adsp_err_get_err_str(-q6core_lcl.adsp_status));
 		ret = adsp_err_get_lnx_err_code(q6core_lcl.adsp_status);
 		goto done;
 	}
@@ -706,14 +704,11 @@ int q6core_get_avcs_api_version_per_service(uint32_t service_id)
 
         ret = q6core_get_avcs_fwk_version();
         if (ret < 0) {
-		if (ret == -EOPNOTSUPP) {
-			/* Look in legacy support... */
-			ret = q6core_get_legacy_avcs_fwk_version(service_id);
-		} else {
-			pr_err("%s: failure in getting AVCS version\n",
-			       __func__);
-		}
-                return ret;
+			if (ret == -EOPNOTSUPP) {
+				/* Look in legacy support... */
+				ret = q6core_get_legacy_avcs_fwk_version(service_id);
+			}
+			return ret;
         }
 
         cached_ver_info = q6core_lcl.q6core_avcs_ver_info.ver_info;
