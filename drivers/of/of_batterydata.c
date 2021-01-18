@@ -345,10 +345,25 @@ struct device_node *of_batterydata_get_best_profile(
 #ifdef CONFIG_MACH_TENOR_G
 		batt_type = "2896330_huaqin_ql1520atl_4000mah_averaged_masterslave_may8th2017";
 #endif
+#ifdef CONFIG_MACH_XIAOMI_O2
+		const char *t1, *t2, *check = NULL;
+		t1 = "d4_sunwoda";
+		t2 = "d4_coslight";
+		rc = of_property_read_string(node, "qcom,battery-type", &check);
+		if(strcmp(check, t1))
+			batt_type = t1;
+		else if(strcmp(check, t1))
+			batt_type = t2;
+#endif
+
 		if (batt_type != NULL) {
 			rc = of_property_read_string(node, "qcom,battery-type",
 							&battery_type);
+#ifndef CONFIG_MACH_XIAOMI_O2
 			if (!rc && strcmp(battery_type, batt_type) == 0) {
+#else
+			if (1) {
+#endif
 				best_node = node;
 				best_id_kohm = batt_id_kohm;
 				break;
