@@ -57,7 +57,7 @@ static ulong ramoops_pmsg_size = MIN_MEM_SIZE;
 module_param_named(pmsg_size, ramoops_pmsg_size, ulong, 0400);
 MODULE_PARM_DESC(pmsg_size, "size of user space message log");
 
-#if defined(CONFIG_MACH_TENOR_G) || defined(CONFIG_MACH_TENOR_E)
+#if defined(CONFIG_MACH_TENOR_G) || defined(CONFIG_MACH_TENOR_E) || defined(CONFIG_MACH_XIAOMI_O2)
 static unsigned long long mem_address = 0x9ff00000;
 #else
 static unsigned long long mem_address;
@@ -66,7 +66,7 @@ module_param(mem_address, ullong, 0400);
 MODULE_PARM_DESC(mem_address,
 		"start of reserved RAM used to store oops/panic logs");
 
-#if defined(CONFIG_MACH_TENOR_G) || defined(CONFIG_MACH_TENOR_E)
+#if defined(CONFIG_MACH_TENOR_G) || defined(CONFIG_MACH_TENOR_E) || defined(CONFIG_MACH_XIAOMI_O2)
 static ulong mem_size = 0x300000;
 #else
 static ulong mem_size;
