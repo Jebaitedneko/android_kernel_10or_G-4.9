@@ -39,6 +39,12 @@
 	aliases {
 		spi8 = &spi_8;
 	};
+	reserved_memory: reserved-memory {
+		ramoops@9ff00000 {
+			compatible = "ramoops";
+			reg = <0x0 0x9ff00000 0x0 0x300000>;
+		};
+	};
 	mtp_batterydata: qcom,battery-data {
 		qcom,batt-id-range-pct = <15>;
 		#include "batterydata-d4-sunwoda-5300mAh.dtsi"
