@@ -16,7 +16,7 @@
 #include <linux/input.h>
 #include <linux/module.h>
 #include <linux/interrupt.h>
-#include <linux/input/ft5x46_ts.h>
+#include "ft5x46_ts.h"
 #include "focaltech_test.h"
 struct i2c_client *focal_i2c_client = NULL;
 static int ft5x46_i2c_recv(struct device *dev,

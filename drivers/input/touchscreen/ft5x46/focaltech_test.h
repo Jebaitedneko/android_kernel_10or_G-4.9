@@ -15,7 +15,7 @@
 #ifndef _TEST_LIB_H
 #define _TEST_LIB_H
 #include <linux/kernel.h>
-#include <linux/input/ft5x46_ts.h>
+#include "ft5x46_ts.h"
 #define boolean unsigned char
 #define bool unsigned char
 #define BYTE unsigned char

@@ -15,7 +15,7 @@
 #include <linux/string.h>
 #include <linux/slab.h>
 #include <linux/i2c.h>
-#include <linux/input/ft5x46_ts.h>
+#include "ft5x46_ts.h"
 #include "focaltech_test.h"
 
 #define DEVIDE_MODE_ADDR            0x00
