@@ -200,10 +200,10 @@
 	qcom,lra-auto-res-mode="qwd";
 	qcom,lra-high-z="opt1";
 	qcom,lra-res-cal-period = <4>;
-	qcom,wave-play-rate-us = <5100>;
+	qcom,wave-play-rate-us = <7500>;
 	qcom,wave-shape = "sine";
-	qcom,vmax-mv = <2088>;
-	qcom,brake-pattern = [03 02 01 00];
+	qcom,vmax-mv = <2750>;
+	qcom,brake-pattern = <3 2 1 0>;
 	qcom,misc-trim-error-rc19p2-clk-reg-present;
 };
 
