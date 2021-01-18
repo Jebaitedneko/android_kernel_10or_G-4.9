@@ -4,7 +4,7 @@
 
 TC_DIR=${HOME}/android/TOOLS/proton-clang
 CFG_DIR=$(pwd)/arch/arm64/configs
-CFG=$CFG_DIR/holland2_defconfig
+CFG=$CFG_DIR/oxygen_defconfig
 
 [ -d $TC_DIR ] \
 && echo -e "\nProton-Clang Present.\n" \

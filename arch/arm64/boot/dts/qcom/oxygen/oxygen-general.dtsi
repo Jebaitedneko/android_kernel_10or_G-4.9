@@ -1,0 +1,385 @@
+/* Copyright (c) 2020, The Linux Foundation. All rights reserved.
+*  Copyright (c) 2020, Jebaitedneko.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License version 2 and
+* only version 2 as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*/
+
+/ {
+	firmware: firmware {
+		android {
+			compatible = "android,firmware";
+			fstab {
+				compatible = "android,fstab";
+				vendor {
+					compatible = "android,vendor";
+					dev = "/dev/block/platform/soc/7824900.sdhci/by-name/cust";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1,discard";
+					fsmgr_flags = "wait";
+					status = "ok";
+				};
+				system {
+					compatible = "android,system";
+					dev = "/dev/block/platform/soc/7824900.sdhci/by-name/system";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1,discard";
+					fsmgr_flags = "wait";
+					status = "ok";
+				};
+			};
+		};
+	};
+	aliases {
+		spi8 = &spi_8;
+	};
+	mtp_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <15>;
+		#include "batterydata-d4-sunwoda-5300mAh.dtsi"
+		#include "batterydata-d4-coslight-5300mAh.dtsi"
+		/delete-node/ qcom,ascent-3450mah;
+		/delete-node/ qcom,itech-3000mah;
+	};
+};
+
+&apps_iommu{
+	qcom,no-aarch64;
+};
+
+&other_ext_mem {
+	reg = <0x0 0x84A00000 0x0 0x1E00000>;
+};
+
+&adsp_fw_mem {
+	reg = <0x0 0x8d600000 0x0 0x1200000>;
+};
+
+&wcnss_fw_mem {
+	reg = <0x0 0x8e800000 0x0 0x700000>;
+};
+
+&spi_3 {
+	status = "disabled";
+	spi-max-frequency = <19200000>;
+	/delete-node/ maxim_sti@0;
+};
+
+&i2c_3 { /* BLSP1 QUP3 (TP) */
+	status = "okay";
+	ft5x46_i2c@38 {
+		compatible = "ft,ft5x46_i2c";
+		reg = <0x38>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <65 0x2008>;
+		vddio-supply = <&tp1v8_vreg>;
+		vdd-supply = <&tp2v8_vreg>;
+		/* pins used by touchscreen */
+		pinctrl-names = "pmx_ts_active","pmx_ts_suspend";
+		pinctrl-0 = <&ts_int_active &ts_reset_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		ft5x46_i2c,i2c-pull-up;
+		ft5x46_i2c,irqflags = <0x2008>;
+		ft5x46_i2c,x-max = <1080>;
+		ft5x46_i2c,y-max = <1920>;
+		ft5x46_i2c,z-max = <255>;
+		ft5x46_i2c,w-max = <200>;
+		ft5x46_i2c,reset-gpio = <&tlmm 64 0x00>;
+		ft5x46_i2c,irq-gpio = <&tlmm 65 0x2008>;
+		ft5x46_i2c,landing-jiffies = <1000>;
+		ft5x46_i2c,landing-threshold = <16>;
+		ft5x46_i2c,staying-threshold = <8>;
+		ft5x46_i2c,raw-min = <7000>;
+		ft5x46_i2c,raw-max = <10000>;
+		ft5x46_i2c,has-key;
+		ft5x46_i2c,key-rx1 = <4>;
+		ft5x46_i2c,key-rx2 = <8>;
+		ft5x46_i2c,key-rx3 = <12>;
+		ft5x46_i2c,open-min = <4000>;
+		ft5x46_i2c,imin-cc = <500>;
+		ft5x46_i2c,imin-cg = <500>;
+		ft5x46_i2c,fw-delay-55-ms = <2>;
+		ft5x46_i2c,fw-delay-aa-ms = <2>;
+		ft5x46_i2c,fw-upgrade-id1 = <0x54>;
+		ft5x46_i2c,fw-upgrade-id2 = <0x2C>;
+		ft5x46_i2c,fw-delay-readid-ms = <20>;
+		ft5x46_i2c,firmware-array-size = <3>;
+		ft5x46_i2c,cfg_0 {
+			ft5x46_i2c,chip = <0x54>;
+			ft5x46_i2c,vendor = <0x3b>;
+			ft5x46_i2c,lcd-vendor = <0x36>;
+			ft5x46_i2c,fw-name = "ft5446_biel.fw";
+			ft5x46_i2c,tx-num = <24>;
+			ft5x46_i2c,rx-num = <13>;
+		};
+		ft5x46_i2c,cfg_1 {
+			ft5x46_i2c,chip = <0x54>;
+			ft5x46_i2c,vendor = <0x51>;
+			ft5x46_i2c,lcd-vendor = <0x36>;
+			ft5x46_i2c,fw-name = "ft5446_ofilm.fw";
+			ft5x46_i2c,tx-num = <24>;
+			ft5x46_i2c,rx-num = <13>;
+		};
+		ft5x46_i2c,cfg_2 {
+			ft5x46_i2c,chip = <0x54>;
+			ft5x46_i2c,vendor = <0x3b>;
+			ft5x46_i2c,lcd-vendor = <0x34>;
+			ft5x46_i2c,fw-name = "ft5446_biel_auo.fw";
+			ft5x46_i2c,tx-num = <24>;
+			ft5x46_i2c,rx-num = <13>;
+		};
+	};
+};
+
+&i2c_2 { /* BLSP2 QUP1 (TAS2560) */
+	tas2560@4e {
+		compatible = "ti,tas2560s";
+		reg = <0x4e>;
+		ti,cdc-left-reset-gpio = <&tlmm 127 0>;
+		ti,cdc-right-reset-gpio = <&tlmm 20 0>;
+		ti,cdc-left-irq-gpio = <&tlmm 63 0>;
+		ti,cdc-right-irq-gpio = <&tlmm 21 0>;
+		ti,left-channel = <0x4f>;
+		ti,right-channel = <0x4c>;
+		ti,left-load = <0>;   /* 0, 8Ohm; 1, 6Ohm; 2, 4Ohm */
+		ti,right-load-aac = <0>;   /* 0, 8Ohm; 1, 6Ohm; 2, 4Ohm */
+		ti,right-load-ssi = <0>;   /* 0, 8Ohm; 1, 6Ohm; 2, 4Ohm */
+		ti,spk-id-pin = <&spk_id_pin>;
+
+	};
+
+	aw2013@45 {
+		compatible = "awinic,aw2013";
+		reg = <0x45>;
+		vdd-supply = <&pm8953_l10>;
+		vcc-supply = <&pm8953_l5>;
+
+		aw2013,white {
+			aw2013,name = "white";
+			aw2013,id = <0>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <3>;
+			aw2013,hold-time-ms = <2>;
+			aw2013,fall-time-ms = <3>;
+			aw2013,off-time-ms = <2>;
+		};
+		aw2013,button-backlight {
+			aw2013,name = "button-backlight";
+			aw2013,id = <1>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <3>;
+			aw2013,hold-time-ms = <2>;
+			aw2013,fall-time-ms = <3>;
+			aw2013,off-time-ms = <2>;
+		};
+	};
+	
+	/delete-node/ adv7533@39;
+};
+
+&i2c_5 { /* BLSP2 QUP1 (NFC) */
+	nq@28 {
+		qcom,nq-esepwr = <&tlmm 141 0x00>;
+	};
+};
+
+&pmi_haptic{
+	qcom,lra-auto-res-mode="qwd";
+	qcom,lra-high-z="opt1";
+	qcom,lra-res-cal-period = <4>;
+	qcom,wave-play-rate-us = <5100>;
+	qcom,wave-shape = "sine";
+	qcom,vmax-mv = <2088>;
+	qcom,brake-pattern = [03 02 01 00];
+	qcom,misc-trim-error-rc19p2-clk-reg-present;
+};
+
+&pm8953_typec {
+	/delete-property/ qcom,ssmux-gpio;
+	/delete-property/ pinctrl-names;
+	/delete-property/ pinctrl-0;
+};
+
+&soc {
+	spi_8: spi@7af8000 { /* BLSP2 QUP4 */
+		compatible = "qcom,spi-qup-v2";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg-names = "spi_physical", "spi_bam_physical";
+		reg = <0x7af8000 0x600>,
+			<0x7ac4000 0x1f000>;
+		interrupt-names = "spi_irq", "spi_bam_irq";
+		interrupts = <0 102 0>, <0 239 0>;
+		spi-max-frequency = <50000000>;
+		pinctrl-names = "spi_default", "spi_sleep";
+		pinctrl-0 = <&spi8_default &spi8_cs0_active>;
+		pinctrl-1 = <&spi8_sleep &spi8_cs0_sleep>;
+		clocks = <&clock_gcc clk_gcc_blsp2_ahb_clk>,
+			<&clock_gcc clk_gcc_blsp2_qup4_spi_apps_clk>;
+		clock-names = "iface_clk", "core_clk";
+		qcom,infinite-mode = <0>;
+		qcom,use-bam;
+		qcom,use-pinctrl;
+		qcom,ver-reg-exists;
+		qcom,bam-consumer-pipe-index = <10>;
+		qcom,bam-producer-pipe-index = <11>;
+		qcom,master-id = <84>;
+		status = "ok";
+		peel_ir@0 {
+			compatible = "peel_ir";
+			reg = <0x0>;
+			spi-max-frequency = <19200000>;
+			peel_ir,lr-gpio = <73>;
+			peel_ir,lr-gpio-valid = <0>;
+			peel_ir,spi-bpw = <32>;
+			peel_ir,spi-clk-speed = <960000>;
+			peel_ir,spi-mode = <0>;
+			peel_ir,peel-field = <2345>;
+			status = "disabled";
+		};
+		irled@0 {
+			compatible = "ir-spi";
+			reg = <0x1>;
+			status = "ok";
+			spi-max-frequency = <1000000>;
+		};
+	};
+	qcom,vidc@1d00000 {
+		reg = <0x01d00000 0xff000>,
+			<0x000a4124 0x4>,
+			<0x000a0164 0x4>;
+		reg-names = "vidc", "efuse", "efuse2";
+		qcom,capability-version = <0x00002000 0x0d>;
+		qcom,dcvs-tbl =
+			/* Dec UHD@30 H.264, HEVC, VP8, VP9 - NOM to NOM+*/
+			<816000 816000 979200 0x3f00000c>,
+
+			/* Enc UHD@30 H.264/HEVC Turbo to Nom+ */
+			<897600 821100 979200 0x4000004>,
+
+			/* Enc True4K@24 H.264/HEVC Nom to Nom+ */
+			<816000 720000 835584 0x4000004>;
+		qcom,dcvs-limit =
+			<32400 24>, /* Encoder UHD */
+			<32400 24>; /* Decoder UHD */
+	};
+	gpio_keys {
+		hall_key {
+			label = "hall_key";
+			gpios = <&tlmm 140 0x01>;
+			linux,input-type = <5>;
+			linux,code = <0>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+		};
+
+		/delete-node/ camera_focus;
+		/delete-node/ camera_snapshot;
+	};
+	gpio13 {
+		pinctrl-names = "tlmm_gpio13_active","tlmm_gpio13_suspend";
+		pinctrl-0 = <&gpio13_active>;
+		pinctrl-1 = <&gpio13_suspend>;
+		compatible = "gpio13";
+		gpios = <&tlmm 13 0x01>;
+		debounce-interval = <15>;
+	};
+	tp1v8_vreg: tp1v8_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "tp1v8_vreg";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		gpio = <&tlmm 61 0>;
+		startup-delay-us = <5000>;
+		enable-active-high;
+	};
+	tp2v8_vreg: tp2v8_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "tp2v8_vreg";
+		regulator-min-microvolt = <2800000>;
+		regulator-max-microvolt = <2800000>;
+		gpio = <&tlmm  128 0>;
+		startup-delay-us = <5000>;
+		enable-active-high;
+	};
+	fingerprint_goodix {
+		compatible = "goodix,fingerprint";
+		interrupt-parent = <&tlmm>;
+		interrupts = <48 0x0>;
+		fp-gpio-irq = <&tlmm 48 0x1>;
+		fp-gpio-reset = <&tlmm 50 0x0>;
+		status = "okay";
+	};
+	fingerprint_fpc {
+		status = "okay";
+		compatible = "fpc,fpc1020";
+		interrupt-parent = <&tlmm>;
+		interrupts = <48 0x0>;
+		fpc,gpio_rst = <&tlmm 50 0x0>;
+		fpc,gpio_irq = <&tlmm 48 0x0>;
+		vdd_ana-supply  = <&fp_vdd_vreg>;
+		/* fpc,enable-on-boot; */
+		/* fpc,enable-wakeup; */
+
+		pinctrl-names = "fpc1020_reset_reset",
+				"fpc1020_reset_active",
+				"fpc1020_irq_active";
+
+		pinctrl-0 = <&msm_gpio_50>;
+		pinctrl-1 = <&msm_gpio_50_output_high>;
+		pinctrl-2 = <&msm_gpio_48>;
+	};
+	sn_fuse: snfuse@0xA4128 {
+		compatible = "qcom,sn-fuse";
+		reg = <0xA4128 0x4>;
+		reg-names = "sn-base";
+	};
+	spk_id_pin: spk-id-pin@9 {
+		compatible = "audio,speaker-id";
+		audio,speaker-id-gpio = <&tlmm 9 0x00>;
+		pinctrl-names = "pull_down", "pull_up", "no_pull";
+		pinctrl-0 = <&spk_id_pull_down>;
+		pinctrl-1 = <&spk_id_pull_up>;
+		pinctrl-2 = <&spk_id_no_pull>;
+	};
+	qcom,wdt@b017000 {
+		qcom,bark-time = <20000>;
+		qcom,pet-time = <15000>;
+	};
+	qcom_seecom: qseecom@84A00000 {
+		compatible = "qcom,qseecom";
+		reg = <0x84A00000 0x1900000>;
+		reg-names = "secapp-region";
+		qcom,hlos-num-ce-hw-instances = <1>;
+		qcom,hlos-ce-hw-instance = <0>;
+		qcom,qsee-ce-hw-instance = <0>;
+		qcom,disk-encrypt-pipe-pair = <2>;
+		qcom,support-fde;
+		qcom,msm-bus,name = "qseecom-noc";
+		qcom,msm-bus,num-cases = <4>;
+		qcom,msm-bus,num-paths = <1>;
+		qcom,support-bus-scaling;
+		qcom,appsbl-qseecom-support;
+		qcom,msm-bus,vectors-KBps =
+			<55 512 0 0>,
+			<55 512 0 0>,
+			<55 512 120000 1200000>,
+			<55 512 393600 3936000>;
+		clocks = <&clock_gcc clk_crypto_clk_src>,
+			 <&clock_gcc clk_gcc_crypto_clk>,
+			 <&clock_gcc clk_gcc_crypto_ahb_clk>,
+			 <&clock_gcc clk_gcc_crypto_axi_clk>;
+		clock-names = "core_clk_src", "core_clk",
+				"iface_clk", "bus_clk";
+		qcom,ce-opp-freq = <100000000>;
+	};
+
+	/delete-node/ qseecom@85b00000;
+};

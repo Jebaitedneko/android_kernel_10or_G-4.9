@@ -1,0 +1,181 @@
+/* Copyright (c) 2020, The Linux Foundation. All rights reserved.
+*  Copyright (c) 2020, Jebaitedneko.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License version 2 and
+* only version 2 as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*/
+
+&spmi_bus {
+	qcom,pm8953@0 {
+		qcom,power-on@800 {
+			qcom,pon_1 {
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <4480>;
+				qcom,s2-timer = <2000>;
+				qcom,s2-type = <7>;
+			};
+		};
+	};
+	qcom,pmi8950@2 {
+		qcom,leds@a100 {
+			qcom,led_mpp_2 {
+				label = "mpp";
+				linux,name = "button-backlight";
+				linux,default-trigger = "none";
+				qcom,default-state = "off";
+				qcom,max-current = <40>;
+				qcom,current-setting = <5>;
+				qcom,id = <6>;
+				qcom,source-sel = <1>;
+				qcom,mode-ctrl = <0x60>;
+				qcom,mode = "manual";
+			};
+		};
+	};
+};
+
+&pmi8950_mpps {
+	mpp@a100 {
+		status = "okay";
+	};
+};
+
+&qpnp_fg {
+	qcom,battery-data = <&mtp_batterydata>;
+	qcom,resume-soc-raw = <253>;
+	qcom,fg-cutoff-voltage-mv = <3400>;
+	qcom,thermal-coefficients = [DA 86 F0 50 08 3C];
+	qcom,vbat-estimate-diff-mv = <200>;
+	qcom,warm-bat-decidegc = <450>;
+	qcom,cool-bat-decidegc = <150>;
+	qcom,hot-bat-decidegc  = <600>;
+	qcom,cold-bat-decidegc = <0>;
+	qcom,ext-sense-type;
+};
+
+&qpnp_smbcharger {
+	qcom,battery-data = <&mtp_batterydata>;
+	qcom,chg-led-sw-controls;
+	qcom,chg-led-support;
+	qcom,external-typec;
+	qcom,typec-psy-name = "typec";
+	qcom,usbin-vadc = <&pmi8950_vadc>;
+	qcom,fastchg-current-ma = <3400>;
+	qcom,float-voltage-mv = <4400>;
+	qcom,thermal-mitigation = <2500 2000 1500 1000>;
+	qcom,thermal-mitigation-screen-off = <3000 2800 2500 2000 1600 1200 1000 500>;
+	qcom,thermal-mitigation-screen-on = <2000 1400 1100 900 700 650 600 500>;
+	qcom,thermal-mitigation-hvdcp-screen-off = <1800 1600 1400 1200 1000 900 700 500>;
+	qcom,thermal-mitigation-hvdcp-screen-on = <1200 900 700 600 550 500 500 500>;
+	qcom,thermal-fcc-screen-off = <3400 3200 2800 2400 1600 1200 1000 500>;
+	qcom,thermal-fcc-screen-on = <1800 1100 1000 900 700 500 300 500>;
+	qcom,fastchg-current-comp = <1200>;
+	qcom,float-voltage-comp = <16>;
+	qcom,override-usb-current;
+	/delete-property/ qcom,autoadjust-vfloat;
+};
+
+&usb3 {
+	vbus_dwc3-supply = <&smbcharger_charger_otg>;
+	qcom,detect-dpdm-floating;
+};
+
+&qusb_phy {
+	qcom,qusb-phy-init-seq = <0xF8 0x80
+				0x23 0x84
+				0x83 0x88
+				0xC0 0x8C
+				0x14 0x9C
+				0x30 0x08
+				0x79 0x0C
+				0x21 0x10
+				0x00 0x90
+				0x9F 0x1C
+				0x00 0x18>;
+};
+
+&pmi8950_gpios {
+	/* GPIO 2 (CHG_STAT) */
+	gpio@c100 {
+		qcom,mode = <1>;	/* Digital output */
+		qcom,output-type = <0>;	/* CMOS */
+		qcom,pull = <5>;	/* No pull */
+		qcom,vin-sel = <0>;	/* VIN0 */
+		qcom,src-sel = <0>;	/* Constant */
+		qcom,invert = <0>;	/* Output low initially */
+		qcom,master-en = <1>;	/* GPIO enabled */
+		status = "okay";
+	};
+};
+
+&pm8953_gpios {
+	/* GPIO 2 (NFC_CLK_REQ) */
+	gpio@c100 {
+		/delete-property/ qcom,output-type;
+		/delete-property/ qcom,pull;
+		/delete-property/ qcom,out-strength;
+	};
+	/* GPIO 8 (USB_HS_ID) */
+	gpio@c700 {
+		/* pm8953 gpio_8 default voltage source is vin3, should change to vin1 */
+		qcom,vin-sel = <1>;
+		status = "okay";
+	};
+};
+
+&pm8953_mpps {
+	/delete-node/ mpp@a100;
+};
+
+&pm8953_vadc {
+	/delete-node/ chan@11;
+};
+
+&wled {
+	qcom,switch-freq-khz = <600>;
+	qcom,en-cabc;
+	/delete-property/ qcom,en-ext-pfet-sc-pro;
+};
+
+&pmi8950_torch0 {
+	qcom,max-current = <100>;
+	qcom,current = <100>;
+};
+
+&pmi8950_torch0 {
+	qcom,max-current = <100>;
+	qcom,current = <100>;
+};
+
+&pm8953_l22 {
+	regulator-min-microvolt = <2850000>;
+	regulator-max-microvolt = <2850000>;
+	qcom,init-voltage = <2850000>;
+};
+
+&pm8953_l6 {
+	regulator-always-on;
+};
+
+&pm8953_l1 {
+	regulator-max-microvolt = <1100000>;
+};
+
+&soc {
+	fp_vdd_vreg: fp_vdd_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "fp_vdd_vreg";
+		startup-delay-us = <4000>;
+		enable-active-high;
+		gpio = <&tlmm 139 0>;
+		regulator-always-on;
+	};
+
+	/delete-node/ eldo2;
+};
