@@ -359,4 +359,9 @@ config MACH_TENOR_G
 	help
 	  This enables support for 10or G
 
+config MACH_XIAOMI_O2
+	bool "Mi MAX 2"
+	help
+	  This enables support for Xiaomi Mi MAX 2
+
 endmenu
