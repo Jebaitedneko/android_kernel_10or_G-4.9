@@ -28,6 +28,8 @@
 #include <linux/delay.h>
 #include <linux/qpnp/qpnp-adc.h>
 #include <linux/pinctrl/consumer.h>
+#include <linux/gpio.h>
+#include <linux/of_gpio.h>
 
 /* Mask/Bit helpers */
 #define _SMB1351_MASK(BITS, POS) \
@@ -510,6 +512,7 @@ struct smb1351_charger {
 	unsigned int		batt_warm_mv;
 	unsigned int		batt_cool_ma;
 	unsigned int		batt_cool_mv;
+	unsigned int		chg_en_gpio;
 
 	/* pinctrl parameters */
 	const char		*pinctrl_state_name;
@@ -3316,6 +3319,17 @@ static int smb1351_parallel_charger_probe(struct i2c_client *client,
 	chip->pl_batfet_mode = POWER_SUPPLY_PL_NON_STACKED_BATFET;
 	if (of_property_read_bool(node, "qcom,stacked-batfet"))
 		chip->pl_batfet_mode = POWER_SUPPLY_PL_STACKED_BATFET;
+
+	chip->chg_en_gpio = of_get_named_gpio(node, "qcom,parallel-chg-en", 0);
+	if (gpio_is_valid(chip->chg_en_gpio)) {
+		rc = gpio_request(chip->chg_en_gpio, "parallel_en_gpio");
+		if (rc)
+			pr_err("failed to request parallel_en_gpio rc = %d\n", rc);
+		/* set parallel_en_gpio to low to enable smb1351 charging */
+		rc = gpio_direction_output(chip->chg_en_gpio, 0);
+		if (rc)
+			pr_err("unable to set output low rc = %d\n", rc);
+	}
 
 	i2c_set_clientdata(client, chip);
 
