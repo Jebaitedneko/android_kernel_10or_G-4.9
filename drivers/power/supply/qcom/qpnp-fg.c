@@ -73,7 +73,7 @@
 
 #define QPNP_FG_DEV_NAME "qcom,qpnp-fg"
 #define MEM_IF_TIMEOUT_MS	5000
-#define FG_CYCLE_MS		3000
+#define FG_CYCLE_MS		1500
 #define BUCKET_COUNT		8
 #define BUCKET_SOC_PCT		(256 / BUCKET_COUNT)
 
@@ -332,7 +332,7 @@ module_param_named(
 	battery_type, fg_batt_type, charp, 00600
 );
 
-static int fg_sram_update_period_ms = 60000;
+static int fg_sram_update_period_ms = 30000;
 module_param_named(
 	sram_update_period_ms, fg_sram_update_period_ms, int, 00600
 );
@@ -2651,7 +2651,7 @@ out:
 	return rc;
 }
 
-#define SANITY_CHECK_PERIOD_MS	6000
+#define SANITY_CHECK_PERIOD_MS	5000
 static void check_sanity_work(struct work_struct *work)
 {
 	struct fg_chip *chip = container_of(work,
@@ -2678,7 +2678,7 @@ try_again:
 	if (chip->last_beat_count == beat_count) {
 		if (!tried_once) {
 			/* Wait for 1 FG cycle and read it once again */
-			msleep(FG_CYCLE_MS);
+			msleep(1500);
 			tried_once = true;
 			goto try_again;
 		} else {
@@ -2697,7 +2697,7 @@ out:
 	fg_relax(&chip->sanity_wakeup_source);
 }
 
-#define SRAM_TIMEOUT_MS			6000
+#define SRAM_TIMEOUT_MS			3000
 static void update_sram_data_work(struct work_struct *work)
 {
 	struct fg_chip *chip = container_of(work,
@@ -2743,7 +2743,7 @@ out:
 #define BATT_TEMP_OFF		DISABLE_THERM_BIT
 #define BATT_TEMP_ON		(FORCE_RBIAS_ON_BIT | TEMP_SENSE_ALWAYS_BIT | \
 				TEMP_SENSE_CHARGE_BIT)
-#define TEMP_PERIOD_UPDATE_MS		60000
+#define TEMP_PERIOD_UPDATE_MS		10000
 #define TEMP_PERIOD_TIMEOUT_MS		3000
 #define BATT_TEMP_LOW_LIMIT		-600
 #define BATT_TEMP_HIGH_LIMIT		1500
@@ -5216,7 +5216,7 @@ static bool is_first_est_done(struct fg_chip *chip)
 	return (fg_soc_sts & SOC_FIRST_EST_DONE) ? true : false;
 }
 
-#define FG_EMPTY_DEBOUNCE_MS	3000
+#define FG_EMPTY_DEBOUNCE_MS	1500
 static irqreturn_t fg_vbatt_low_handler(int irq, void *_chip)
 {
 	struct fg_chip *chip = _chip;
@@ -6030,7 +6030,7 @@ static void discharge_gain_work(struct work_struct *work)
 #define FIRST_EST_DONE_BIT		BIT(5)
 #define MAX_TRIES_FIRST_EST		3
 #define FIRST_EST_WAIT_MS		2000
-#define PROFILE_LOAD_TIMEOUT_MS		6000
+#define PROFILE_LOAD_TIMEOUT_MS		5000
 static int fg_do_restart(struct fg_chip *chip, bool write_profile)
 {
 	int rc, ibat_ua;
@@ -6280,7 +6280,7 @@ fail:
 #define PROFILE_COMPARE_LEN		32
 #define THERMAL_COEFF_ADDR		0x444
 #define THERMAL_COEFF_OFFSET		0x2
-#define BATTERY_PSY_WAIT_MS		6000
+#define BATTERY_PSY_WAIT_MS		2000
 static int fg_batt_profile_init(struct fg_chip *chip)
 {
 	int rc = 0, ret;
@@ -8344,7 +8344,7 @@ static int fg_init_iadc_config(struct fg_chip *chip)
 
 #define EN_WR_FGXCT_PRD		BIT(6)
 #define EN_RD_FGXCT_PRD		BIT(5)
-#define FG_RESTART_TIMEOUT_MS	60000
+#define FG_RESTART_TIMEOUT_MS	12000
 static void ima_error_recovery_work(struct work_struct *work)
 {
 	struct fg_chip *chip = container_of(work,
@@ -8424,7 +8424,7 @@ static void ima_error_recovery_work(struct work_struct *work)
 	}
 
 	/* Wait for at least a FG cycle before doing SRAM access */
-	msleep(FG_CYCLE_MS);
+	msleep(2000);
 
 	chip->block_sram_access = false;
 
@@ -8600,7 +8600,7 @@ static int fg_detect_pmic_type(struct fg_chip *chip)
 	return 0;
 }
 
-#define INIT_JEITA_DELAY_MS 3000
+#define INIT_JEITA_DELAY_MS 1000
 static void delayed_init_work(struct work_struct *work)
 {
 	int rc;
