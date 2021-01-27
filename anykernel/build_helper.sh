@@ -6,12 +6,10 @@ TC_DIR=${HOME}/android/TOOLS/proton-clang
 CFG_DIR=$(pwd)/arch/arm64/configs
 CFG=$CFG_DIR/holland2_defconfig
 
-[ -d $TC_DIR ] \
-&& echo -e "\nProton-Clang Present.\n" \
-|| echo -e "\nProton-Clang Not Present. Downloading Around 500MB...\n" \
-| mkdir -p $TC_DIR \
-| git clone --depth=1 https://github.com/kdrag0n/proton-clang $TC_DIR \
-| echo "Done."
+[ ! -d $TC_DIR/EVA_LLD ] \
+&& mkdir -p $TC_DIR/EVA_LLD \
+&& git clone --depth=1 https://github.com/mvaisakh/gcc-arm64 -b lld-integration $TC_DIR/EVA_LLD/64 \
+&& git clone --depth=1 https://github.com/mvaisakh/gcc-arm -b lld-integration $TC_DIR/EVA_LLD/32
 
 echo -e "\nChecking Clang Version...\n"
 PATH="$TC_DIR/bin:${PATH}" clang --version
@@ -85,30 +83,20 @@ CONFIG_TOUCHSCREEN_IST3038C=y
 }
 
 pcmake() {
-PATH="$TC_DIR/bin:${PATH}" \
-make	\
+PATH="$TC_DIR/EVA_LLD/64/bin:$TC_DIR/EVA_LLD/32/bin:${PATH}" \
+make \
 	O=out \
 	ARCH=arm64 \
-	CC="ccache clang" \
-	CXX="ccache clang++" \
-	AR="ccache llvm-ar" \
-	AS="ccache llvm-as" \
-	NM="ccache llvm-nm" \
+	CC="ccache $TC_DIR/EVA_LLD/64/bin/aarch64-elf-gcc" \
 	LD="ccache ld.lld" \
-	STRIP="ccache llvm-strip" \
+	NM="ccache llvm-nm" \
 	OBJCOPY="ccache llvm-objcopy" \
-	OBJDUMP="ccache llvm-objdump"\
-	OBJSIZE="ccache llvm-size" \
-	READELF="ccache llvm-readelf" \
-	HOSTCC="ccache clang" \
-	HOSTCXX="ccache clang++" \
-	HOSTAR="ccache llvm-ar" \
-	HOSTAS="ccache llvm-as" \
 	HOSTNM="ccache llvm-nm" \
 	HOSTLD="ccache ld.lld" \
-	CROSS_COMPILE="aarch64-linux-gnu-" \
-	CROSS_COMPILE_ARM32="arm-linux-gnueabi-" \
+	HOSTOBJCOPY="ccache llvm-objcopy" \
+	CROSS_COMPILE="$TC_DIR/EVA_LLD/64/bin/aarch64-elf-" \
+	CROSS_COMPILE_ARM32="$TC_DIR/EVA_LLD/32/bin/arm-eabi-" \
 	CONFIG_DEBUG_SECTION_MISMATCH=y \
 	CONFIG_NO_ERROR_ON_MISMATCH=y \
-	$1 $2 $3 || exit
+$1 $2 $3 || exit
 }
