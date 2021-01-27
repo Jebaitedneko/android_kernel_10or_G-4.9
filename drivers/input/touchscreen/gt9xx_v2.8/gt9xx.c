@@ -21,6 +21,7 @@
 #include <linux/pinctrl/consumer.h>
 #include <linux/input/mt.h>
 #include "gt9xx.h"
+#include <../drivers/input/touchscreen/xiaomi_dt2w.h>
 
 #define GOODIX_VTG_MIN_UV	2600000
 #define GOODIX_VTG_MAX_UV	3300000
@@ -2238,6 +2239,11 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	/* probe init finished */
 	ts->init_done = true;
 	gtp_work_control_enable(ts, true);
+
+	ret = dt2w_probe(client);
+	if (ret) {
+		dev_info(&client->dev, "Failed to probe dt2w, status: %s", xiaomi_dt2w_enable ? "Enabled" : "Disabled");
+	}
 
 	return 0;
 
