@@ -98,5 +98,24 @@ make \
 	CROSS_COMPILE_ARM32="$TC_DIR/EVA_LLD/32/bin/arm-eabi-" \
 	CONFIG_DEBUG_SECTION_MISMATCH=y \
 	CONFIG_NO_ERROR_ON_MISMATCH=y \
-$1 $2 $3 || exit
+	$1 $2 $3 || exit
+}
+
+pcmake_cust() {
+PATH="$TC_DIR/EVA_LLD/64/bin:$TC_DIR/EVA_LLD/32/bin:${PATH}" \
+make \
+	O=out \
+	ARCH=arm64 \
+	CC="ccache $TC_DIR/EVA_LLD/64/bin/aarch64-elf-gcc" \
+	LD="ccache ld.lld" \
+	NM="ccache llvm-nm" \
+	OBJCOPY="ccache llvm-objcopy" \
+	HOSTNM="ccache llvm-nm" \
+	HOSTLD="ccache ld.lld" \
+	HOSTOBJCOPY="ccache llvm-objcopy" \
+	CROSS_COMPILE="$TC_DIR/EVA_LLD/64/bin/aarch64-elf-" \
+	CROSS_COMPILE_ARM32="$TC_DIR/EVA_LLD/32/bin/arm-eabi-" \
+	CONFIG_DEBUG_SECTION_MISMATCH=y \
+	CONFIG_NO_ERROR_ON_MISMATCH=y \
+	$1 $2 $3 || exit
 }
