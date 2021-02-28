@@ -160,7 +160,9 @@ enum {
     TRACE_CODE_SME_RX_WDA_MSG,
 };
 
+#ifdef WLAN_LOGGING_SOCK_SVC_ENABLE
 void smeTraceInit(tpAniSirGlobal pMac);
+#endif
 void sme_register_debug_callback(void);
 #include <disable.h>
 #endif //__SME_TRACE_H__

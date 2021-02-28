@@ -71,6 +71,7 @@
 #include <wlan_hdd_hostapd.h>
 #include "cfgApi.h"
 #include <wlan_logging_sock_svc.h>
+#include <wlan_hdd_host_offload.h>
 
 #ifdef WLAN_BTAMP_FEATURE
 #include "bapApi.h"

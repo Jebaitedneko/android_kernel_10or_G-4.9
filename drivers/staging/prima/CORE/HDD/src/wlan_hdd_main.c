@@ -14810,8 +14810,8 @@ int hdd_wlan_startup(struct device *dev )
    hdd_init_sw_pta(pHddCtx);
    goto success;
 
-err_open_cesium_nl_sock:
 #ifdef WLAN_LOGGING_SOCK_SVC_ENABLE
+err_open_cesium_nl_sock:
    hdd_close_cesium_nl_sock();
 #endif
 
@@ -16197,8 +16197,12 @@ v_U8_t hdd_is_fw_logging_enabled(void)
     pHddCtx = vos_get_context(VOS_MODULE_ID_HDD,
                               vos_get_global_context(VOS_MODULE_ID_HDD, NULL));
 
+#ifdef WLAN_LOGGING_SOCK_SVC_ENABLE
     return (pHddCtx && pHddCtx->cfg_ini->wlanLoggingEnable &&
             pHddCtx->cfg_ini->enableMgmtLogging);
+#else
+    return 0;
+#endif
 }
 
 /*
@@ -16211,8 +16215,12 @@ v_U8_t hdd_is_fw_ev_logging_enabled(void)
     pHddCtx = vos_get_context(VOS_MODULE_ID_HDD,
                               vos_get_global_context(VOS_MODULE_ID_HDD, NULL));
 
+#ifdef WLAN_LOGGING_SOCK_SVC_ENABLE
     return (pHddCtx && pHddCtx->cfg_ini->wlanLoggingEnable &&
             pHddCtx->cfg_ini->enableFWLogging);
+#else
+    return 0;
+#endif
 }
 
 /*

@@ -6457,6 +6457,7 @@ static int __wlan_hdd_cfg80211_wifi_logger_start(struct wiphy *wiphy,
         tb[QCA_WLAN_VENDOR_ATTR_WIFI_LOGGER_FLAGS]);
     hddLog(LOG1, FL("flag=%d"), start_log.flag);
 
+#ifdef WLAN_LOGGING_SOCK_SVC_ENABLE
     if ((RING_ID_PER_PACKET_STATS == start_log.ringId) &&
                  (!hdd_ctx->cfg_ini->wlanPerPktStatsLogEnable ||
         !vos_isPktStatsEnabled()))
@@ -6465,6 +6466,7 @@ static int __wlan_hdd_cfg80211_wifi_logger_start(struct wiphy *wiphy,
        hddLog(LOGE, FL("per pkt stats not enabled"));
        return -EINVAL;
     }
+#endif
 
     vos_set_ring_log_level(start_log.ringId, start_log.verboseLevel);
     return 0;

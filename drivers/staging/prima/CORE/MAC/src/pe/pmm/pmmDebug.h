@@ -48,8 +48,10 @@
 #define __printf(a,b)
 #endif
 
+#ifdef WLAN_LOGGING_SOCK_SVC_ENABLE
 void __printf(3,4) pmmLog(tpAniSirGlobal pMac, tANI_U32 loglevel,
                           const char *pString, ...) ;
+#endif
 
 #include <disable.h>
 #endif

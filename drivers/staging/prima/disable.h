@@ -22,3 +22,15 @@
 #define vos_trace_setLevel(x, ...)
 #define vos_trace_setValue(x, ...)
 #define vos_trace_spin_lock_init(x, ...)
+#define wlan_free_fwr_mem_dump_buffer(x, ...)
+#define wlan_store_fwr_mem_dump_size(x, ...)
+#define wlan_logging_set_log_level(x, ...)
+#define logPrintf(x, ...)
+#define wlan_is_log_report_in_progress(x, ...) 0
+#define wlan_set_log_completion(x, ...) 0
+#define wlan_get_log_and_reset_completion(x, ...) 0
+#define wlan_reset_log_report_in_progress(x, ...)
+#define wlan_isPktStatsEnabled(x, ...) 0
+#define wlan_process_done_indication(x, ...)
+#define wlan_flush_host_logs_for_fatal(x, ...)
+#define wlan_disable_and_flush_pkt_stats(x, ...)

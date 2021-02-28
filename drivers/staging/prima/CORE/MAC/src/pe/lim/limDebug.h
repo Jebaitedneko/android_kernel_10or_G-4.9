@@ -46,8 +46,10 @@
 #define __printf(a,b)
 #endif
 
+#ifdef WLAN_LOGGING_SOCK_SVC_ENABLE
 void __printf(3,4) limLog(tpAniSirGlobal pMac, tANI_U32 loglevel,
                           const char *pString, ...);
+#endif
 
 /* define this to show more message in the LIM during TDLS development */
 #define LIM_DEBUG_TDLS

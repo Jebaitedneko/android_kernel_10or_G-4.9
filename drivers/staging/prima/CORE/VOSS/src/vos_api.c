@@ -1846,12 +1846,14 @@ VOS_STATUS __vos_fatal_event_logs_req( uint32_t is_fatal,
        return VOS_STATUS_E_FAILURE;
     }
 
+#ifdef WLAN_LOGGING_SOCK_SVC_ENABLE
     if(!pHddCtx->cfg_ini->wlanLoggingEnable)
     {
        VOS_TRACE(VOS_MODULE_ID_VOSS, VOS_TRACE_LEVEL_INFO,
             "%s: Wlan logging not enabled", __func__);
         return VOS_STATUS_E_FAILURE;
     }
+#endif
 
     if (!pHddCtx->cfg_ini->enableFatalEvent || !pHddCtx->is_fatal_event_log_sup)
     {
@@ -3695,11 +3697,13 @@ bool vos_is_wlan_logging_enabled(void)
        return false;
     }
 
+#ifdef WLAN_LOGGING_SOCK_SVC_ENABLE
     if (!hdd_ctx->cfg_ini->wlanLoggingEnable)
     {
        hddLog(VOS_TRACE_LEVEL_FATAL,"%s: Logging framework not enabled!", __func__);
        return false;
     }
+#endif
 
     return true;
 }
