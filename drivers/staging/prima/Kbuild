@@ -13,7 +13,7 @@ ifeq ($(KERNEL_BUILD),1)
 	WLAN_ROOT := drivers/staging/prima
 endif
 
-ifeq ($(KERNEL_BUILD), 0)
+ifeq ($(KERNEL_BUILD), 1)
 # These are configurable via Kconfig for kernel-based builds
 # Need to explicitly configure for Android-based builds
 
@@ -721,7 +721,7 @@ CDEFINES += -DEXISTS_MSM_SMSM
 endif
 
 # Fix build for GCC 4.7
-EXTRA_CFLAGS += -Wno-maybe-uninitialized -Wno-unused-function
+EXTRA_CFLAGS += -Wno-unused-function -Wno-typedef-redefinition -Wno-enum-conversion -Wno-non-literal-null-conversion -Wno-empty-body -Wno-pointer-bool-conversion -Wno-parentheses-equality
 
 ifeq ($(CONFIG_WLAN_OFFLOAD_PACKETS),y)
 CDEFINES += -DWLAN_FEATURE_OFFLOAD_PACKETS
