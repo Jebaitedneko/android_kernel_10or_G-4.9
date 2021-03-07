@@ -119,10 +119,10 @@ static inline void netlink_exit(void) {
 }
 
 static inline int gf_parse_dts(struct gf_dev* gf_dev) {
-	gf_dev->reset_gpio = of_get_named_gpio(gf_dev->spi->dev.of_node,"goodix,gpio_reset",0);
+	gf_dev->reset_gpio = of_get_named_gpio(gf_dev->spi->dev.of_node,"fp-gpio-reset",0);
 	gpio_request(gf_dev->reset_gpio, "goodix_reset");
 	gpio_direction_output(gf_dev->reset_gpio, 1);
-	gf_dev->irq_gpio = of_get_named_gpio(gf_dev->spi->dev.of_node,"goodix,gpio_irq",0);
+	gf_dev->irq_gpio = of_get_named_gpio(gf_dev->spi->dev.of_node,"fp-gpio-irq",0);
 	gpio_request(gf_dev->irq_gpio, "goodix_irq");
 	gpio_direction_input(gf_dev->irq_gpio);
 	return 0;

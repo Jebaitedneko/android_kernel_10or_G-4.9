@@ -3,4 +3,11 @@ config INPUT_FINGERPRINT
 	help
 	  Say Y here to enable fingerprint driver support.
 
-source "drivers/input/fingerprint/gf3258/Kconfig"
+if INPUT_FINGERPRINT
+
+config CONFIG_FINGERPRINT_GOODIX_FOD
+	tristate "goodix fingerprint fod"
+	help 
+		say Y to enable fod goodix
+
+endif
