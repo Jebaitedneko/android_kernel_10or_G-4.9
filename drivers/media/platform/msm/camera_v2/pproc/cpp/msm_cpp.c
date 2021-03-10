@@ -4490,8 +4490,15 @@ static int msm_cpp_buffer_private_ops(struct cpp_device *cpp_dev,
 		ioctl_arg.ioctl_ptr = 0x0;
 		MSM_CAM_GET_IOCTL_ARG_PTR(&ioctl_arg.ioctl_ptr, &buff_mgr_info,
 			sizeof(void *));
-		rc = cpp_dev->buf_mgr_ops.msm_cam_buf_mgr_ops(
-			VIDIOC_MSM_BUF_MNGR_GET_BUF, buff_mgr_info);
+		rc = cpp_dev->buf_mgr_ops.msm_cam_buf_mgr_ops(buff_mgr_ops,
+			&ioctl_arg);
+		/* Use VIDIOC_MSM_BUF_MNGR_GET_BUF if getbuf with indx fails */
+		if (rc < 0) {
+			pr_err_ratelimited("get_buf_by_idx for %d err %d,use get_buf\n",
+				buff_mgr_info->index, rc);
+			rc = cpp_dev->buf_mgr_ops.msm_cam_buf_mgr_ops(
+				VIDIOC_MSM_BUF_MNGR_GET_BUF, buff_mgr_info);
+		}
 		break;
 	}
 	default: {
