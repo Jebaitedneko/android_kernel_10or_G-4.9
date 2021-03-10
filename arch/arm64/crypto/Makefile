@@ -19,7 +19,7 @@ ghash-ce-y := ghash-ce-glue.o ghash-ce-core.o
 
 obj-$(CONFIG_CRYPTO_AES_ARM64_CE) += aes-ce-cipher.o
 aes-ce-cipher-y := aes-ce-cipher-glue.o aes-ce-cipher-core.o
-CFLAGS_aes-ce-cipher-core.o += -march=armv8-a+crypto -Wa,-march=armv8-a+crypto $(DISABLE_LTO) $(call cc-option,-no-integrated-as)
+CFLAGS_aes-ce-cipher-core.o += -march=armv8-a+crypto -Wa,-march=armv8-a+crypto $(DISABLE_LTO)
 
 obj-$(CONFIG_CRYPTO_AES_ARM64_CE_CCM) += aes-ce-ccm.o
 aes-ce-ccm-y := aes-ce-ccm-glue.o aes-ce-ccm-core.o
@@ -38,16 +38,6 @@ CFLAGS_aes-glue-ce.o	:= -DUSE_V8_CRYPTO_EXTENSIONS
 obj-$(CONFIG_CRYPTO_CRC32_ARM64) += crc32-arm64.o
 
 CFLAGS_crc32-arm64.o	:= -mcpu=generic+crc
-
-ifeq ($(CONFIG_ARCH_MSM8953), y)
-EXTRA_CFLAGS += -O3 -mcpu=cortex-a53+crypto+crc -Wa,-mcpu=cortex-a53+crypto+crc -mtune=cortex-a53
-EXTRA_AFLAGS += -O3 -mcpu=cortex-a53+crypto+crc -Wa,-mcpu=cortex-a53+crypto+crc -mtune=cortex-a53
-else
-ifeq ($(CONFIG_ARCH_MSM8937), y)
-EXTRA_CFLAGS += -O3 -mcpu=cortex-a53+crypto+crc -Wa,-mcpu=cortex-a53+crypto+crc -mtune=cortex-a53
-EXTRA_AFLAGS += -O3 -mcpu=cortex-a53+crypto+crc -Wa,-mcpu=cortex-a53+crypto+crc -mtune=cortex-a53
-endif
-endif
 
 $(obj)/aes-glue-%.o: $(src)/aes-glue.c FORCE
 	$(call if_changed_rule,cc_o_c)
