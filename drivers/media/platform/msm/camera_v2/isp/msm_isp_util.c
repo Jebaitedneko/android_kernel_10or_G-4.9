@@ -2231,8 +2231,6 @@ void msm_isp_do_tasklet(unsigned long data)
 		ts = queue_cmd->ts;
 		spin_unlock_irqrestore(&tasklet->tasklet_lock, flags);
 		atomic_sub(1, &vfe_dev->irq_cnt);
-		if (vfe_dev->vfe_open_cnt == 0)
-			continue;
 		msm_isp_prepare_tasklet_debug_info(vfe_dev,
 			irq_status0, irq_status1, ts);
 		trace_msm_cam_isp_status_dump("VFE_TASKLET:", vfe_dev->pdev->id,
