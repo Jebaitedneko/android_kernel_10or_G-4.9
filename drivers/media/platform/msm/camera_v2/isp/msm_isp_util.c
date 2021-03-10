@@ -2230,6 +2230,12 @@ void msm_isp_do_tasklet(unsigned long data)
 		pingpong_status = queue_cmd->vfe_pingpong_status;
 		ts = queue_cmd->ts;
 		spin_unlock_irqrestore(&tasklet->tasklet_lock, flags);
+		if (vfe_dev->vfe_open_cnt == 0) {
+			pr_err("%s: VFE%d open cnt = %d, irq %x/%x\n",
+			__func__, vfe_dev->pdev->id, vfe_dev->vfe_open_cnt,
+			irq_status0, irq_status1);
+			continue;
+		}
 		atomic_sub(1, &vfe_dev->irq_cnt);
 		msm_isp_prepare_tasklet_debug_info(vfe_dev,
 			irq_status0, irq_status1, ts);
