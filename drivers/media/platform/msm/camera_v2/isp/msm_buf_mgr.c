@@ -875,8 +875,12 @@ static int msm_isp_buf_enqueue(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_buffer *buf_info = NULL;
 
 	bufq = msm_isp_get_bufq(buf_mgr, info->handle);
-	if (!bufq)
+	if (!bufq) {
+		pr_err("%s: Invalid bufq, handle 0x%x, stream id %x num_plane %d\n"
+			, __func__, info->handle, (info->handle >> 8),
+			info->buffer.num_planes);
 		return -EINVAL;
+	}
 
 	buf_state = msm_isp_buf_prepare(buf_mgr, info, NULL);
 	if (buf_state < 0) {
