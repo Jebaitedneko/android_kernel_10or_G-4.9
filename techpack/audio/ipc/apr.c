@@ -79,7 +79,12 @@ static const struct file_operations apr_debug_ops = {
 };
 #endif
 
-#define APR_PKT_INFO(x...) ((void)0)
+#define APR_PKT_INFO(x...) \
+do { \
+	if (apr_pkt_ctx) \
+		ipc_log_string(apr_pkt_ctx, "<APR>: "x); \
+} while (0)
+
 
 struct apr_svc_table {
 	char name[64];
@@ -297,7 +302,7 @@ static void apr_adsp_up(void)
 		wake_up(&dsp_wait);
 
 	if (!is_child_devices_loaded) {
-		queue_delayed_work(system_power_efficient_wq,&add_chld_dev_work,
+		schedule_delayed_work(&add_chld_dev_work,
 				msecs_to_jiffies(100));
 		is_child_devices_loaded = true;
 	}
@@ -1101,7 +1106,7 @@ static struct notifier_block modem_service_nb = {
 };
 
 #ifdef CONFIG_DEBUG_FS
-static int __init apr_debug_init(void)
+static int apr_debug_init(void)
 {
 	debugfs_apr_debug = debugfs_create_file("msm_apr_debug",
 						 S_IFREG | 0444, NULL, NULL,
@@ -1109,7 +1114,7 @@ static int __init apr_debug_init(void)
 	return 0;
 }
 #else
-static int __init apr_debug_init(void)
+static int apr_debug_init(void)
 {
 	return 0;
 }

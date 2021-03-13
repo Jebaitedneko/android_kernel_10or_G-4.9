@@ -318,11 +318,6 @@ static int random_read_wakeup_bits = 64;
 static int random_write_wakeup_bits = 28 * OUTPUT_POOL_WORDS;
 
 /*
- * Variable is currently unused by left for user space compatibility.
- */
-static int random_min_urandom_seed = 60;
-
-/*
  * Originally, we used a primitive polynomial of degree .poolwords
  * over GF(2).  The taps for various sizes are defined below.  They
  * were chosen to be evenly spaced except for the last tap, which is 1
@@ -912,13 +907,6 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
 	}
 }
 
-static inline void maybe_reseed_primary_crng(void)
-{
-	if (crng_init > 2 &&
-	    time_after(jiffies, primary_crng.init_time + CRNG_RESEED_INTERVAL))
-		crng_reseed(&primary_crng, &input_pool);
-}
-
 static inline void crng_wait_ready(void)
 {
 	wait_event_interruptible(crng_init_wait, crng_ready());
@@ -1064,6 +1052,8 @@ void add_device_randomness(const void *buf, unsigned int size)
 }
 EXPORT_SYMBOL(add_device_randomness);
 
+static struct timer_rand_state input_timer_state = INIT_TIMER_RAND_STATE;
+
 /*
  * This function adds entropy to the entropy "pool" by using timing
  * delays.  It uses the timer_rand_state structure to make an estimate
@@ -1132,7 +1122,16 @@ static void add_timer_randomness(struct timer_rand_state *state, unsigned num)
 void add_input_randomness(unsigned int type, unsigned int code,
 				 unsigned int value)
 {
-	return;
+	static unsigned char last_value;
+
+	/* ignore autorepeat and the like */
+	if (value == last_value)
+		return;
+
+	last_value = value;
+	add_timer_randomness(&input_timer_state,
+			     (type << 4) ^ code ^ (code >> 4) ^ value);
+	trace_add_input_randomness(ENTROPY_BITS(&input_pool));
 }
 EXPORT_SYMBOL_GPL(add_input_randomness);
 
@@ -1216,7 +1215,7 @@ void add_interrupt_randomness(int irq, int irq_flags)
 		return;
 
 	r = &input_pool;
-	if (!spin_trylock_irqsave(&r->lock, flags))
+	if (!spin_trylock(&r->lock))
 		return;
 
 	fast_pool->last = now;
@@ -1232,7 +1231,7 @@ void add_interrupt_randomness(int irq, int irq_flags)
 		__mix_pool_bytes(r, &seed, sizeof(seed));
 		credit = 1;
 	}
-	spin_unlock_irqrestore(&r->lock, flags);
+	spin_unlock(&r->lock);
 
 	fast_pool->count = 0;
 
@@ -1891,7 +1890,7 @@ static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 			return -EPERM;
 		if (crng_init < 2)
 			return -ENODATA;
-		crng_reseed(&primary_crng, NULL);
+		crng_reseed(&primary_crng, &input_pool);
 		crng_global_init_time = jiffies - 1;
 		return 0;
 	default:
@@ -1966,6 +1965,7 @@ SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
 static int min_read_thresh = 8, min_write_thresh;
 static int max_read_thresh = OUTPUT_POOL_WORDS * 32;
 static int max_write_thresh = INPUT_POOL_WORDS * 32;
+static int random_min_urandom_seed = 60;
 static char sysctl_bootid[16];
 
 /*
