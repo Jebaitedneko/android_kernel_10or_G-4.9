@@ -133,7 +133,7 @@ static struct pll_clk apcs_hf_pll = {
 	},
 	.base = &virt_bases[APCS_C0_PLL_BASE],
 	#if (defined CONFIG_MACH_XIAOMI_C6) || (defined CONFIG_MACH_TENOR_G)
-	.max_rate = 2828800000UL,
+	.max_rate = 3264000000UL,
 	.min_rate = 435200000UL,
 	#else
 	.max_rate = 2208000000UL,
@@ -146,7 +146,7 @@ static struct pll_clk apcs_hf_pll = {
 		.ops = &clk_ops_variable_rate,
 		/* MX level of MSM is much higher than of PLL */
 		#if (defined CONFIG_MACH_XIAOMI_C6) || (defined CONFIG_MACH_TENOR_G)
-		VDD_MX_HF_FMAX_MAP1(SVS, 2828800000UL),
+		VDD_MX_HF_FMAX_MAP1(SVS, 3264000000UL),
 		#else
 		VDD_MX_HF_FMAX_MAP1(SVS, 2400000000UL),
 		#endif
