@@ -92,15 +92,6 @@ ifeq ($(cc-name),clang)
 VDSO_CFLAGS += $(call cc32-disable-warning, vectorizer-no-neon)
 endif
 
-ifeq ($(CONFIG_ARCH_MSM8953), y)
-KBUILD_CFLAGS += -march=armv8-a+crypto+crc -mtune=cortex-a53 -mcpu=cortex-a53+crypto+crc
-KBUILD_AFLAGS += -march=armv8-a+crypto+crc -mtune=cortex-a53 -mcpu=cortex-a53+crypto+crc
-else
-ifeq ($(CONFIG_ARCH_MSM8937), y)
-KBUILD_CFLAGS += -march=armv8-a+crypto+crc -mtune=cortex-a53 -mcpu=cortex-a53+crypto+crc
-KBUILD_AFLAGS += -march=armv8-a+crypto+crc -mtune=cortex-a53 -mcpu=cortex-a53+crypto+crc
-endif
-endif
 VDSO_AFLAGS := $(VDSO_CAFLAGS)
 VDSO_AFLAGS += -D__ASSEMBLY__
 
