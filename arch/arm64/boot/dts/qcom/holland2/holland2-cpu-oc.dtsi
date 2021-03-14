@@ -322,7 +322,7 @@
 
 		/* Speed bin 7 */
 		<600000  700000 750000 800000 850000
-			850000 875000 875000 900000 900000 900000 900000 900000 900000>;
+			850000 875000 875000 900000 1000000 1100000 1100000 1200000 1200000>;
 
 	qcom,cpr-voltage-floor =
 		/* Speed bin 0 */
@@ -570,12 +570,12 @@
 
 &pm8953_s5 {
 	regulator-min-microvolt = <350000>; /* Default 400000 */
-	regulator-max-microvolt = <900000>; /* Default 1140000 */
+	regulator-max-microvolt = <1200000>; /* Default 1140000 */
 };
 
 &pm8953_s5_limit {
 	regulator-min-microvolt = <350000>; /* Default 400000 */
-	regulator-max-microvolt = <900000>; /* Default 1140000 */
+	regulator-max-microvolt = <1200000>; /* Default 1140000 */
 };
 
 &CPU_COST_0 {
