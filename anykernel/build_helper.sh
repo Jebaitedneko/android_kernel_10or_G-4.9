@@ -4,7 +4,7 @@
 
 TC_DIR=${HOME}/android/TOOLS/GCC
 CFG_DIR=$(pwd)/arch/arm64/configs
-CFG=$CFG_DIR/msm8953-perf_defconfig
+CFG=$CFG_DIR/holland2_defconfig
 
 [ -d $TC_DIR/arm64 ] \
 && echo -e "EVA-GCC arm64 Present.\n" \
