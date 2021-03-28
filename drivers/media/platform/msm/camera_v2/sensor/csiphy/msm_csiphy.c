@@ -57,7 +57,7 @@
 #define CSI_3PHASE_HW                               1
 #define MAX_DPHY_DATA_LN                            4
 #define CLOCK_OFFSET                              0x700
-#define CSIPHY_SOF_DEBUG_COUNT                      2
+#define CSIPHY_SOF_DEBUG_COUNT                      5
 #define MBPS                                      1000000
 #define SNPS_INTERPHY_OFFSET                      0x800
 #define SET_THE_BIT(x)                            (0x1 << x)

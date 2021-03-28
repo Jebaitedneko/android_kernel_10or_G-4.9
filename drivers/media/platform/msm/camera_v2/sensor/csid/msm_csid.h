@@ -21,7 +21,7 @@
 #include "msm_sd.h"
 #include "cam_soc_api.h"
 
-#define CSID_SOF_DEBUG_COUNT                      3
+#define CSID_SOF_DEBUG_COUNT                      5
 
 enum csiphy_lane_assign {
 	PHY_LANE_D0,
