@@ -7,6 +7,8 @@ KROOT=$(pwd)
 DARCH=arm64
 DEFCG=holland2_defconfig
 ZNAME=holland2
+CACHE=1
+TOOLC=3
 
 MODIR=$KROOT/out/modules
 OSDIR=$KROOT/out/arch/$DARCH/boot
@@ -20,6 +22,7 @@ YYLL2=$KROOT/scripts/dtc/dtc-lexer.l
 [ -f $YYLL2 ] && sed -i "s/extern YYLTYPE yylloc/YYLTYPE yylloc/g;s/YYLTYPE yylloc/extern YYLTYPE yylloc/g" $YYLL2
 
 get_gcc49() {
+	ISGCC=1
 	TC_64=$KROOT/../gcc-4.9-64
 	TC_32=$KROOT/../gcc-4.9-32
 
@@ -50,6 +53,7 @@ get_gcc49() {
 }
 
 get_gcc11() {
+	ISGCC=1
 	TC_64=$KROOT/../gcc-11-64
 	TC_32=$KROOT/../gcc-11-32
 
@@ -80,6 +84,7 @@ get_gcc11() {
 }
 
 get_proton_clang() {
+	ISCLANG=1
 	TC=$KROOT/../clang-proton
 
 	if [ ! -d $TC ]; then
@@ -100,9 +105,11 @@ get_proton_clang() {
 				HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar HOSTAS=llvm-as HOSTLD=ld.lld"
 }
 
-# get_gcc49
-# get_gcc11
-get_proton_clang
+case $TOOLC in
+	1) echo -e "\nSelecting GCC-4.9...\n" && get_gcc49 ;;
+	2) echo -e "\nSelecting EVA-GCC-11...\n" && get_gcc11 ;;
+	3) echo -e "\nSelecting PROTON-CLANG-13...\n" && get_proton_clang ;;
+esac
 
 if [[ $DARCH = "arm" ]]; then
 	CROSS_COMPILE=$CROSS_ARM32
@@ -149,7 +156,24 @@ ISDTBO=` grep "DT_OVERLAY=y" $KROOT/out/.config `
 [[ $ISDTBO ]] && export DTC_EXT=$(which dtc)
 
 echo -e "\n\nmake `echo -e $MAKEOPTS` O=out ARCH=$DARCH -j$((`nproc`+4))\n\n"
-make `echo -e $MAKEOPTS` O=out ARCH=$DARCH -j$((`nproc`+8)) || exit
+
+if [[ $ISGCC ]]; then
+	if [[ $CACHE ]]; then
+		echo "Using ccache with gcc"
+		make `echo -e $MAKEOPTS` O=out ARCH=$DARCH CC="ccache ${CROSS_COMPILE}gcc" -j$((`nproc`+8)) || exit
+	else
+		make `echo -e $MAKEOPTS` O=out ARCH=$DARCH -j$((`nproc`+8)) || exit
+	fi
+else
+	if [[ $ISCLANG ]]; then
+		if [[ $CACHE ]]; then
+			echo "Using ccache with clang"
+			make `echo -e $MAKEOPTS` O=out ARCH=$DARCH CC="ccache clang" -j$((`nproc`+8)) || exit
+		else
+			make `echo -e $MAKEOPTS` O=out ARCH=$DARCH -j$((`nproc`+8)) || exit
+		fi
+	fi
+fi
 
 if [[ $MODULE ]]; then
 	[ -d $MODIR ] && rm -rf $MODIR | mkdir -p $MODIR || mkdir -p $MODIR
