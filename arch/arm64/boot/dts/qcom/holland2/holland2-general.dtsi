@@ -1,0 +1,258 @@
+/* Copyright (c) 2020, The Linux Foundation. All rights reserved.
+*  Copyright (c) 2020, Jebaitedneko.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License version 2 and
+* only version 2 as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*/
+
+/ {
+
+	chosen {
+		bootargs = "quiet core_ctl_disable_cpumask=0-7 kpti=0 noirqdebug";
+	};
+
+	firmware: firmware {
+
+		android {
+
+			fstab {
+
+				/delete-node/ vbmeta;
+
+				vendor {
+
+					dev = "/dev/block/platform/soc/7824900.sdhci/by-name/vendor";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1,discard";
+					fsmgr_flags = "wait";
+					status = "okay";
+				};
+
+				system {
+
+					compatible = "android,system";
+					dev = "/dev/block/platform/soc/7824900.sdhci/by-name/system";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1,discard";
+					fsmgr_flags = "wait";
+					status = "okay";
+				};
+			};
+		};
+	};
+
+	reserved_memory: reserved-memory {
+
+		ramoops@9ff00000 {
+			compatible = "ramoops";
+			reg = <0x0 0x9ff00000 0x0 0x300000>;
+		};
+	};
+
+	qrd_batterydata: qcom,battery-data {
+		#include "batterydata_Amazon_4V4_4000mAh.dtsi"
+	};
+};
+
+&other_ext_mem {
+	reg = <0x0 0x84A00000 0x0 0x1E00000>;
+};
+
+&modem_mem {
+
+	no-map;
+
+	/delete-property/ no-map-fixup;
+};
+
+&soc {
+
+	i2c@78b7000 { /* BLSP1 QUP3 */
+
+		status = "okay";
+
+		focaltech@38 {
+
+			compatible = "focaltech,5435";
+			reg = <0x38>;
+			interrupt-parent = <&tlmm>;
+			interrupts = <65 0x2>;
+			vdd-supply = <&pm8953_l10>;
+			vcc_i2c-supply = <&pm8953_l6>;
+			/* pins used by touchscreen */
+			pinctrl-names = "pmx_ts_active",
+						"pmx_ts_suspend",
+						"pmx_ts_release";
+			pinctrl-0 = <&ts_int_active &ts_reset_active>;
+			pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+			pinctrl-2 = <&ts_release>;
+			focaltech,name = "ft5435";
+			focaltech,family-id = <0x54>;
+			focaltech,reset-gpio = <&tlmm 64 0x0>;
+			focaltech,irq-gpio = <&tlmm 65 0x2008>;
+			focaltech,display-coords = <0 0 1080 1920>;
+			focaltech,panel-coords = <0 0 1080 1920>;
+			focaltech,button-map= <139 172 158>;
+			focaltech,no-force-update;
+			focaltech,i2c-pull-up;
+			focaltech,group-id = <1>;
+			focaltech,hard-reset-delay-ms = <200>;
+			focaltech,soft-reset-delay-ms = <200>;
+			focaltech,num-max-touches = <10>;
+			focaltech,fw-delay-aa-ms = <2>;
+			focaltech,fw-delay-55-ms = <2>;
+			focaltech,fw-upgrade-id1 = <0x54>;
+			focaltech,fw-upgrade-id2 = <0x2c>;
+			focaltech,fw-delay-readid-ms = <10>;
+			focaltech,fw-delay-era-flsh-ms = <2000>;
+			focaltech,fw-auto-cal;
+			focaltech,fw-vkey-support;
+			focaltech,resume-in-workqueue;
+			focaltech,num-virtual-key = <3>;
+			focal,virtual_key_1 = <172 500 2040>;/*home*/
+			focal,virtual_key_2 = <139 200 2040>;/*menu*/
+			focal,virtual_key_3 = <158 800 2040>;/*back*/
+			/* Underlying clocks used by secure touch */
+			clock-names = "iface_clk", "core_clk";
+			clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
+				<&clock_gcc clk_gcc_blsp1_qup3_i2c_apps_clk>;
+		};
+
+		goodix_ts@5d {
+			compatible = "goodix,gt9xx";
+			status = "okay";
+			reg = <0x5d>;
+			vdd_ana-supply = <&pm8953_l10>;
+			vcc_i2c-supply = <&pm8953_l6>;
+			interrupt-parent = <&tlmm>;
+			interrupts = <13 0x2008>;
+			pinctrl-names = "gdix_ts_int_default", "gdix_ts_int_output_low",
+					"gdix_ts_int_output_high", "gdix_ts_int_input",
+					"gdix_ts_rst_default", "gdix_ts_rst_output_low",
+					"gdix_ts_rst_output_high", "gdix_ts_rst_input";
+			pinctrl-0 = <&ts_int_default>;
+			pinctrl-1 = <&ts_int_output_low>;
+			pinctrl-2 = <&ts_int_output_high>;
+			pinctrl-3 = <&ts_int_input>;
+			pinctrl-4 = <&ts_rst_default>;
+			pinctrl-5 = <&ts_rst_output_low>;
+			pinctrl-6 = <&ts_rst_output_high>;
+			pinctrl-7 = <&ts_rst_input>;
+			reset-gpios = <&tlmm 64 0x00>;
+			irq-gpios = <&tlmm 65 0x2008>;
+			irq-flags = <1>;
+			touchscreen-max-id = <5>;
+			touchscreen-size-x = <1080>;
+			touchscreen-size-y = <1920>;
+			touchscreen-max-w = <1080>;
+			touchscreen-max-p = <1024>;
+			goodix,type-a-report = <1>;
+			goodix,driver-send-cfg = <1>;
+			goodix,resume-in-workqueue = <1>;
+			goodix,int-sync = <1>;
+			goodix,swap-x2y = <0>;
+			goodix,esd-protect = <1>;
+			goodix,auto-update = <0>;
+			goodix,auto-update-cfg = <0>;
+			goodix,power-off-sleep = <0>;
+			goodix,cfg-group0 = [
+                        45 38 04 80 07 0A 3C 80 02 C8 28 
+                        05 50 37 03 05 00 00 00 00 11 11 
+                        05 16 19 1E 14 87 27 CC 56 58 D3 
+                        07 00 00 02 D2 02 11 00 00 00 00 
+                        00 03 40 14 14 00 00 3C 64 8F D0 
+                        52 08 19 00 04 9F 3F 00 93 46 00 
+                        89 4D 00 89 55 00 78 5F 00 78 00 
+                        00 00 00 00 00 00 00 00 00 00 00 
+                        00 00 00 00 00 00 00 00 00 00 00 
+                        00 00 00 00 00 00 00 00 00 00 00 
+                        00 00 01 02 03 04 05 06 07 08 0B 
+                        0A 09 00 17 16 15 14 13 12 11 10 
+                        0F 0E 0D 0C FF FF FF FF FF FF 1E 
+                        1F 20 22 24 28 29 0A 08 06 05 04 
+                        02 00 FF FF FF 00 00 00 00 00 00 
+                        00 00 00 23 32 41 00 00 00 00 00 
+                        00 00 00 00 00 5A 00 00 00 00 00 
+                        00 00 00 28 5A 00 00 00 00 00 00 
+                        00 00 00 00 00 00 00 00 00 00 00 
+                        00 00 00 00 00 00 00 00 00 00 00 
+                        00 00 00 00 00 00 0C 01];
+		};
+
+		/delete-node/ synaptics@4b;
+
+	 };
+
+	gen-vkeys {
+
+		compatible = "qcom,gen-vkeys";
+		label = "ft5x06_ts";
+		qcom,disp-maxx = <1080>;
+		qcom,disp-maxy = <1920>;
+		qcom,panel-maxx = <1080>;
+		qcom,panel-maxy = <1920>;
+		qcom,key-codes = <139 172 158>;
+		qcom,y-offset = <0>;
+	};
+
+	usb3: ssusb@7000000 {
+		vbus_dwc3-supply = <&smbcharger_charger_otg>;
+		qcom,detect-dpdm-floating;
+	};
+
+	goodix_fp {
+
+		status = "okay";
+
+		compatible = "goodix,fingerprint";
+		interrupt-parent = <&tlmm>;
+		interrupts = <48 0x0>;
+		vdd-supply = <&pm8953_l10>;
+		goodix,gpio_reset = <&tlmm 140 0>;
+		goodix,gpio_irq    = <&tlmm 48 0>;
+	};
+
+	qcom_seecom: qseecom@84A00000 {
+
+		compatible = "qcom,qseecom";
+		reg = <0x84A00000 0x1900000>;
+		reg-names = "secapp-region";
+		qcom,hlos-num-ce-hw-instances = <1>;
+		qcom,hlos-ce-hw-instance = <0>;
+		qcom,qsee-ce-hw-instance = <0>;
+		qcom,disk-encrypt-pipe-pair = <2>;
+		qcom,support-fde;
+		qcom,msm-bus,name = "qseecom-noc";
+		qcom,msm-bus,num-cases = <4>;
+		qcom,msm-bus,num-paths = <1>;
+		qcom,support-bus-scaling;
+		qcom,msm-bus,vectors-KBps =
+			<55 512 0 0>,
+			<55 512 0 0>,
+			<55 512 120000 1200000>,
+			<55 512 393600 3936000>;
+		clocks = <&clock_gcc clk_crypto_clk_src>,
+			 <&clock_gcc clk_gcc_crypto_clk>,
+			 <&clock_gcc clk_gcc_crypto_ahb_clk>,
+			 <&clock_gcc clk_gcc_crypto_axi_clk>;
+		clock-names = "core_clk_src", "core_clk",
+				"iface_clk", "bus_clk";
+		qcom,ce-opp-freq = <100000000>;
+
+		/delete-property/ qcom,appsbl-qseecom-support;
+
+	};
+
+	/delete-node/ qseecom@85b00000;
+
+	qcom,wcnss-wlan@0a000000 {
+
+		qcom,is-pronto-vadc;
+	};
+};

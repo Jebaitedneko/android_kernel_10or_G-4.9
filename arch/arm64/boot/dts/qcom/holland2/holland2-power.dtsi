@@ -1,0 +1,263 @@
+/* Copyright (c) 2020, The Linux Foundation. All rights reserved.
+*  Copyright (c) 2020, Jebaitedneko.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License version 2 and
+* only version 2 as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*/
+
+&wled {
+	qcom,en-ext-pfet-sc-pro;
+};
+
+&sdhc_2 {
+
+	status = "okay";
+	cd-gpios = <&tlmm 133 0x0>;
+};
+
+&spmi_bus {
+
+	qcom,pm8953@0 {
+
+		qcom,power-on@800 {
+
+			qcom,pon_1 {
+
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <6720>;
+				qcom,s2-timer = <1000>;
+				qcom,s2-type = <7>;
+			};
+
+			qcom,pon_3 {
+
+				qcom,pon-type = <3>;
+				qcom,pull-up = <1>;
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <6720>;
+				qcom,s2-timer = <2000>;
+				qcom,s2-type = <7>;
+			};
+		};
+
+		pm8953_gpios: gpios {
+
+			gpio@c700 {
+				status = "okay";
+				qcom,master-en = <0>;
+			};
+		};
+
+		pm8953_vadc: vadc@3100 {
+
+			chan@36 {
+				qcom,decimation = <1>;
+				qcom,fast-avg-setup = <5>;
+			};
+
+			/delete-node/ chan@11;
+		};
+
+		pm8953_adc_tm: vadc@3400 {
+
+			chan@36 {
+				qcom,decimation = <1>;
+				qcom,fast-avg-setup = <5>;
+			};
+
+			/delete-node/ chan@11;
+		};
+
+		/delete-node/ qcom,pm8953_typec@bf00;
+	};
+
+	qcom,pmi8950@2 {
+
+		pmi8950_vadc: vadc@3100 {
+			status = "disabled";
+		};
+
+		pmi8950_gpios: gpios {
+
+			gpio@c000 {
+
+				status = "okay";
+				qcom,mode = <1>;
+				qcom,pull = <4>;
+				qcom,src-sel = <2>;
+				qcom,master-en = <1>;
+				qcom,out-strength = <2>;
+			};
+		};
+
+		pmi8950_charger: qcom,qpnp-smbcharger {
+
+			qcom,float-voltage-mv = <4400>;
+			qcom,float-voltage-comp = <15>;
+			qcom,fastchg-current-ma = <3000>;
+			qcom,skip-usb-suspend-for-fake-battery;
+			qcom,thermal-mitigation = <3000 3000 3000 3000 3000 3000 3000 3000>;
+			qcom,float-voltage-mv-ntc = <4100>;
+			qcom,chg-led-sw-controls;
+			qcom,chg-led-support;
+
+			/delete-property/ qcom,external-typec;
+			/delete-property/ qcom,fastchg-current-comp;
+			/delete-property/ qcom,parallel-usb-min-current-ma;
+			/delete-property/ qcom,parallel-usb-9v-min-current-ma;
+			/delete-property/ qcom,parallel-allowed-lowering-ma;
+			/delete-property/ qcom,typec-psy-name;
+
+		};
+
+		pmi8950_fg: qcom,fg {
+
+			/delete-property/ qcom,fg-therm-delay-us;
+
+			qcom,cold-bat-decidegc = <(-300)>;
+			qcom,cool-bat-decidegc = <(-200)>;
+			qcom,hot-bat-decidegc = <650>;
+			qcom,warm-bat-decidegc = <610>;
+			qcom,cold-hot-jeita-hysteresis = <10 10>;
+			qcom,fg-cutoff-voltage-mv = <3400>;
+			qcom,fg-use-vbat-low-empty-soc;
+			qcom,irq-volt-empty-mv = <3400>;
+			qcom,battery-data = <&qrd_batterydata>;
+			qcom,thermal-coefficients = [DA 86 F0 50 08 3C];
+			qcom,hold-soc-while-full;
+		};
+	};
+
+	qcom,pmi8950@3 {
+
+		pmi8950_pwm: pwm@b000 {
+			status = "okay";
+		};
+
+		labibb: qpnp-labibb-regulator {
+			status = "okay";
+		};
+
+		pmi_haptic: qcom,haptics@c000 {
+
+			qcom,actuator-type = <1>;
+			qcom,vmax-mv = <3400>;
+		};
+	};
+};
+
+&thermal_zones {
+	case-therm-step {
+		trips {
+			modem_trip0: modem-trip0 {
+				temperature = <70000>;
+			};
+			modem_trip1: modem-trip1 {
+				temperature = <72000>;
+			};
+			modem_trip2: modem-trip2 {
+				temperature = <75000>;
+				type = "critical";
+			};
+		};
+	};
+
+	xo-therm-adc {
+		polling-delay = <1000>;
+	};
+
+	chg-temp-adc {
+		status = "disabled";
+	};
+
+	pa-therm1-adc {
+		status = "disabled";
+	};
+};
+
+&soc {
+
+	qcom,lpm-levels {
+
+		qcom,use-psci;
+
+		qcom,pm-cluster@0 {
+
+			qcom,disable-prediction;
+			qcom,disable-ipi-prediction;
+
+			qcom,pm-cluster-level@0 {
+				qcom,disable-prediction;
+				qcom,disable-ipi-prediction;
+			};
+
+			qcom,pm-cluster-level@1 {
+				qcom,disable-prediction;
+				qcom,disable-ipi-prediction;
+			};
+
+			qcom,pm-cluster-level@2 {
+				qcom,disable-prediction;
+				qcom,disable-ipi-prediction;
+			};
+
+			qcom,pm-cluster@0 {
+
+				qcom,disable-prediction;
+				qcom,disable-ipi-prediction;
+
+				qcom,pm-cluster-level@0 {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+
+				qcom,pm-cluster-level@1 {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+
+				qcom,pm-cluster-level@2 {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+
+				qcom,pm-cpu {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+			};
+
+			qcom,pm-cluster@1 {
+
+				qcom,disable-prediction;
+				qcom,disable-ipi-prediction;
+
+				qcom,pm-cluster-level@0 {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+
+				qcom,pm-cluster-level@1 {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+
+				qcom,pm-cluster-level@2 {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+
+				qcom,pm-cpu {
+					qcom,disable-prediction;
+					qcom,disable-ipi-prediction;
+				};
+			};
+		};
+	};
+};
