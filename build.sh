@@ -213,11 +213,6 @@ do.systemless=0
 do.cleanup=1
 do.cleanuponabort=0
 device.name1=generic
-device.name2=
-device.name3=
-device.name4=
-device.name5=
-supported.versions=
 '; }
 
 block=/dev/block/bootdevice/by-name/boot;
@@ -231,9 +226,11 @@ chown -R root:root $ramdisk/*;
 dump_boot;
 
 ui_print "*******************************************"
-ui_print "Updating Kernel and Patching cmdline to permissive..."
+ui_print "Updating Kernel and Patching cmdline..."
 ui_print "*******************************************"
 
+patch_cmdline firmware_class.path firmware_class.path=/vendor/firmware_mnt/image
+patch_cmdline lpm_levels.sleep_disabled lpm_levels.sleep_disabled=0
 patch_cmdline androidboot.selinux androidboot.selinux=permissive
 
 write_boot;
