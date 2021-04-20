@@ -246,7 +246,7 @@ make_dtimg() {
 	wget -q https://raw.githubusercontent.com/LineageOS/android_system_tools_dtbtool/lineage-18.1/dtbtool.c -O $KROOT/out/dtbtool.c
 	cc $KROOT/out/dtbtool.c -o $OSDIR/dts
 	(
-		cd $KROOT/dts
+		cd $OSDIR/dts
 		echo "Making dt.img using dtbtool..."
 		dtbtool -v -s 2048 -o $OSDIR/dt.img
 		echo "Done."
