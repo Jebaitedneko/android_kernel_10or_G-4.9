@@ -282,7 +282,7 @@ make_dtimg() {
 
 	if [[ $MODULE ]]; then
 		find $KROOT/out/modules -type f -iname "*.ko" -exec cp {} $AKDIR/modules/system/lib/modules/ \;
-		zip -r ${PREFIX}_${FORMAT}.zip . -x '*.git*' '*patch*' '*ramdisk*' 'LICENSE' 'README.md'
+		zip -r ${ZNAME}_${PREFIX}_${FORMAT}.zip . -x '*.git*' '*patch*' '*ramdisk*' 'LICENSE' 'README.md'
 	else
 		zip -r ${ZNAME}_${PREFIX}_${FORMAT}.zip . -x '*.git*' '*modules*' '*patch*' '*ramdisk*' 'LICENSE' 'README.md'
 	fi
